@@ -2,12 +2,14 @@
 
 namespace App\Controllers;
 
+use App\Models\AuthException;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use function App\Helpers\user;
 
 /**
  * Class BaseController
@@ -35,7 +37,7 @@ abstract class BaseController extends Controller
      *
      * @var list<string>
      */
-    protected $helpers = [];
+    protected $helpers = ['auth', 'procurat', 'group'];
 
     /**
      * Be sure to declare properties for any property fetch you initialized.
@@ -48,11 +50,31 @@ abstract class BaseController extends Controller
      */
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
-        // Do Not Edit This Line
         parent::initController($request, $response, $logger);
+    }
 
-        // Preload any models, libraries, etc, here.
+    /**
+     * @throws AuthException
+     */
+    public function render($name, $data = null, $renderNavbar = true, $renderFooter = true): string
+    {
+        $renderedContent = view('components/header');
 
-        // E.g.: $this->session = service('session');
+        if ($renderNavbar) {
+            helper('auth');
+            $renderedContent .= view('components/navbar', ['user' => user()]);
+        }
+
+        if (!is_null($data)) {
+            $renderedContent .= view($name, $data);
+        } else {
+            $renderedContent .= view($name);
+        }
+
+        if ($renderFooter) {
+            $renderedContent .= view('components/footer');
+        }
+
+        return $renderedContent;
     }
 }
