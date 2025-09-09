@@ -32,6 +32,17 @@
     <div class="col-lg-12">
         <?= isset($error) ? '<div class="alert alert-danger mb-3"> <i class="fas fa-exclamation-triangle"></i> <b>' . lang('index.error') . '</b> ' . $error . '</div>' : '' ?>
         <?= !empty(session('error')) ? '<div class="alert alert-danger mb-3"> <i class="fas fa-exclamation-triangle"></i> <b>' . lang('index.error') . '</b> ' . session('error') . '</div>' : '' ?>
+
+        <?php if (idate('H') < 9): ?>
+            <div class="alert alert-warning mb-3">
+                <?= lang('absences.group.deviationNotice') ?>
+            </div>
+        <?php endif; ?>
+        <?php if (idate('H') >= 13): ?>
+            <div class="alert alert-warning mb-3">
+                <?= lang('absences.group.officeHoursNotice') ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 

@@ -109,6 +109,18 @@ function getProcuratAbsences(): array
     return $absences;
 }
 
+function countProcuratAbsences(): int
+{
+    $client = createAPIClient();
+
+    try {
+        $rawAbsences = decodeResponse($client->get('absences?type=today'));
+        return count($rawAbsences);
+    } catch (GuzzleException $e) {
+    }
+    return -1;
+}
+
 /**
  * @param int $personId
  * @return bool
