@@ -9,7 +9,8 @@
         "codeigniter4/framework": "^4.0",
         "guzzlehttp/guzzle": "^7.10",
         "jumbojett/openid-connect-php": "^1.0",
-        "mpdf/mpdf": "^8.2"
+        "mpdf/mpdf": "^8.2",
+      "ext-mbstring": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9",

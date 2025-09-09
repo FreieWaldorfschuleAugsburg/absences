@@ -34,7 +34,7 @@ class AbsenceController extends BaseController
                         if ($absence->getPersonId() == $member->getId() && $absence->isExcused()) {
                             $entry['absent'] = true;
                             $entry['note'] = $absence->getNote();
-                            $entry['halfDay'] = false;
+                            $entry['halfDay'] = isHalfDayAbsence($absence);
                             break;
                         }
                     }
@@ -108,17 +108,60 @@ class AbsenceController extends BaseController
         }
     }
 
-    public function printPresent(string $groupId): RedirectResponse|string
+    public function printPresent(string $groupName): RedirectResponse|string
     {
-        $group = getProcuratGroup($groupId);
-        if (!$group) {
-            return redirect('absences')->with('error', 'Ungültige Gruppe.');
-        }
+        try {
+            $user = user();
+            if (!is_null($user)) {
+                $group = findAbsenceGroupByName($groupName);
+                if (!$group) {
+                    return redirect('/')->with('error', lang('absences.error.invalidGroup'));
+                }
 
-        $mpdf = $this->createMPDF();
-        $mpdf->WriteHTML(view('absences/print/PresencePrintView', ['group' => $group]));
-        $mpdf->Output();
-        exit;
+                $entries = [];
+                $members = findAbsenceGroupMembers($group);
+                $absences = getProcuratAbsences();
+                $followUps = getProcuratFollowUps();
+
+                foreach ($members as $member) {
+                    $entry = ['person' => $member];
+
+                    foreach ($absences as $absence) {
+                        if ($absence->getPersonId() == $member->getId() && $absence->isExcused()) {
+                            $entry['absent'] = true;
+                            if (isHalfDayAbsence($absence)) {
+                                $entry['halfDay'] = true;
+                                $entry['note'] = $absence->getNote();
+                                break;
+                            }
+                        }
+                    }
+
+                    // Skip fully absent students
+                    if (key_exists('absent', $entry) && !key_exists('halfDay', $entry)) {
+                        continue;
+                    }
+
+                    foreach ($followUps as $followUp) {
+                        if ($followUp->getReferencedPersonId() == $member->getId() && $followUp->getSubject() == 'Schüler fehlt') {
+                            $entry['absent'] = true;
+                            $entry['note'] = $followUp->getMessage();
+                            break;
+                        }
+                    }
+
+                    $entries[] = $entry;
+                }
+
+                $mpdf = $this->createMPDF();
+                $mpdf->WriteHTML(view('print/PresentPrintView', ['user' => $user, 'group' => $group, 'entries' => $entries]));
+                $mpdf->Output();
+                exit;
+            }
+            return login();
+        } catch (AuthException $e) {
+            return handleAuthException($this, $e);
+        }
     }
 
     public function absent(int $personId): string|RedirectResponse
