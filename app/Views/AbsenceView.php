@@ -78,7 +78,9 @@
                 <div class="card <?= $entry['halfDay'] ? 'bg-orange' : 'bg-red' ?> mb-3">
                     <div class="card-body">
                         <h5><?= $entry['person']->getFullName() ?></h5>
-                        <small><b><?= lang('absences.group.note') ?></b> <?= $entry['note'] ?></small>
+                        <small><b><?= lang('absences.group.note') ?></b></small><small
+                                onmouseenter="blurText(this, false)" onmouseleave="blurText(this, true)"
+                                class="blurred"> <?= $entry['note'] ?></small>
                     </div>
                     <div class="card-footer">
                         <?php if ($entry['halfDay']): ?>
@@ -100,7 +102,9 @@
                     <div class="card-body">
                         <h5><?= $entry['person']->getFullName() ?></h5>
                         <?php if (key_exists('followUp', $entry)): ?>
-                            <small><b><?= lang('absences.group.note') ?></b> <?= $entry['note'] ?></small>
+                            <small><b><?= lang('absences.group.note') ?></b></small>
+                            <small onmouseenter="blurText(this, false)" onmouseleave="blurText(this, true)"
+                                   class="blurred"> <?= $entry['note'] ?></small>
                         <?php else: ?>
                             <small>&nbsp;</small>
                         <?php endif; ?>
@@ -121,6 +125,14 @@
     function confirmRedirect(url) {
         if (confirm('<?= lang('app.confirm') ?>')) {
             window.location.href = url;
+        }
+    }
+
+    function blurText(element, blur) {
+        if (blur) {
+            element.classList.replace('visible', 'blurred');
+        } else {
+            element.classList.replace('blurred', 'visible');
         }
     }
 </script>
