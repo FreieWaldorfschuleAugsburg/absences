@@ -1,14 +1,30 @@
 <style>
-    .bg-green {
-        background: green;
+    @media (prefers-color-scheme: dark) {
+        .bg-green {
+            background-color: green;
+        }
+
+        .bg-orange {
+            background-color: #FF5C00;
+        }
+
+        .bg-red {
+            background-color: darkred;
+        }
     }
 
-    .bg-orange {
-        background: #FF5C00;
-    }
+    @media (prefers-color-scheme: light) {
+        .bg-green {
+            background-color: #88e788;
+        }
 
-    .bg-red {
-        background: darkred;
+        .bg-orange {
+            background-color: #ffc067;
+        }
+
+        .bg-red {
+            background-color: #ff746c;
+        }
     }
 </style>
 
