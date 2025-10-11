@@ -78,9 +78,13 @@
                 <div class="card <?= $entry['halfDay'] ? 'bg-orange' : 'bg-red' ?> mb-3">
                     <div class="card-body">
                         <h5><?= $entry['person']->getFullName() ?></h5>
-                        <small><b><?= lang('absences.group.note') ?></b></small><small
-                                onmouseenter="blurText(this, false)" onmouseleave="blurText(this, true)"
-                                class="blurred"> <?= $entry['note'] ?></small>
+                        <?php if (key_exists('note', $entry)): ?>
+                            <small><b><?= lang('absences.group.note') ?></b></small><small
+                                    onmouseenter="blurText(this, false)" onmouseleave="blurText(this, true)"
+                                    class="blurred"> <?= $entry['note'] ?></small>
+                        <?php else: ?>
+                            <small>&nbsp;</small>
+                        <?php endif; ?>
                     </div>
                     <div class="card-footer">
                         <?php if ($entry['halfDay']): ?>
