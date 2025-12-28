@@ -7,6 +7,7 @@
 
 <?php
 $isSchoolDay = date('N') < 6;
+$isSchoolDay = true;
 ?>
 
 <div class="row mb-3 justify-content-center">

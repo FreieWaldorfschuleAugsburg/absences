@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\AuthException;
+use App\Models\OAuthException;
 use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
@@ -37,7 +37,7 @@ abstract class BaseController extends Controller
      *
      * @var list<string>
      */
-    protected $helpers = ['auth', 'procurat', 'group'];
+    protected $helpers = ['oauth', 'procurat', 'group'];
 
     /**
      * Be sure to declare properties for any property fetch you initialized.
@@ -51,30 +51,5 @@ abstract class BaseController extends Controller
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
-    }
-
-    /**
-     * @throws AuthException
-     */
-    public function render($name, $data = null, $renderNavbar = true, $renderFooter = true): string
-    {
-        $renderedContent = view('components/header');
-
-        if ($renderNavbar) {
-            helper('auth');
-            $renderedContent .= view('components/navbar', ['user' => user()]);
-        }
-
-        if (!is_null($data)) {
-            $renderedContent .= view($name, $data);
-        } else {
-            $renderedContent .= view($name);
-        }
-
-        if ($renderFooter) {
-            $renderedContent .= view('components/footer');
-        }
-
-        return $renderedContent;
     }
 }

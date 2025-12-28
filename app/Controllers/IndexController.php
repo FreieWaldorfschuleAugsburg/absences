@@ -2,26 +2,23 @@
 
 namespace App\Controllers;
 
-use App\Models\AuthException;
+use App\Models\OAuthException;
 use CodeIgniter\HTTP\RedirectResponse;
-use function App\Helpers\handleAuthException;
-use function App\Helpers\login;
-use function App\Helpers\user;
+use function App\Helpers\logout;
 
 class IndexController extends BaseController
 {
-    public function index(): string|RedirectResponse
+    public function index(): string
     {
-        try {
-            $user = user();
-            if (!is_null($user)) {
-                $groups = getAbsenceGroups();
+        $groups = getAbsenceGroups();
+        return view('IndexView', ['groups' => $groups]);
+    }
 
-                return $this->render('IndexView', ['groups' => $groups]);
-            }
-            return login();
-        } catch (AuthException $e) {
-            return handleAuthException($this, $e);
-        }
+    /**
+     * @throws OAuthException
+     */
+    public function logout(): RedirectResponse
+    {
+        return logout();
     }
 }

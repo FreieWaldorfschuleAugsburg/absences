@@ -8,13 +8,15 @@ class UserModel
     private string $displayName;
     private string $idToken;
     private string $refreshToken;
+    private array $groups;
 
-    function __construct($username, $displayName, $idToken, $refreshToken)
+    function __construct($username, $displayName, $idToken, $refreshToken, $groups)
     {
         $this->username = $username;
         $this->displayName = $displayName;
         $this->idToken = $idToken;
         $this->refreshToken = $refreshToken;
+        $this->groups = $groups;
     }
 
     public function getUsername(): string
@@ -35,5 +37,10 @@ class UserModel
     public function getRefreshToken(): string
     {
         return $this->refreshToken;
+    }
+
+    public function getGroups(): array
+    {
+        return $this->groups;
     }
 }

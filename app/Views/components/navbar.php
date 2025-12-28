@@ -11,7 +11,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarMobileToggle">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                
+
             </ul>
             <ul class="navbar-nav">
 
@@ -23,11 +23,14 @@
                         <i class="fas fa-user"></i> <?= $user->getDisplayName() ?>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" href="<?= getenv('oidc.accountManager') ?>"><i
-                                        class="fas fa-user-cog"></i> <?= lang('menu.self.account') ?></a></li>
                         <li><a class="dropdown-item" href="<?= base_url('logout') ?>"><i
-                                        class="fas fa-sign-out-alt"></i> <?= lang('menu.self.logout') ?></a></li>
+                                        class="fas fa-sign-out-alt"></i> <?= lang('navbar.self.logout') ?></a></li>
                     </ul>
+                </li>
+                <li>
+                    <a class="nav-link" href="<?= getenv('oidc.portalUrl') ?>">
+                        <i class="fas fa-external-link"></i> <?= lang('navbar.portal') ?>
+                    </a>
                 </li>
             </ul>
         </div>

@@ -3,7 +3,7 @@
 namespace App\Helpers;
 
 use App\Controllers\BaseController;
-use App\Models\AuthException;
+use App\Models\OAuthException;
 use App\Models\UserModel;
 use CodeIgniter\HTTP\RedirectResponse;
 use Exception;
@@ -11,7 +11,7 @@ use Jumbojett\OpenIDConnectClient;
 use Jumbojett\OpenIDConnectClientException;
 
 /**
- * @throws AuthException
+ * @throws OAuthException
  */
 function isLoggedIn(): bool
 {
@@ -19,7 +19,7 @@ function isLoggedIn(): bool
 }
 
 /**
- * @throws AuthException
+ * @throws OAuthException
  */
 function login(): RedirectResponse
 {
@@ -38,12 +38,12 @@ function login(): RedirectResponse
 
         return redirect('/');
     } catch (OpenIDConnectClientException $e) {
-        throw new AuthException('oidc_login_error', $e);
+        throw new OAuthException('oidc_login_error', $e);
     }
 }
 
 /**
- * @throws AuthException
+ * @throws OAuthException
  */
 function logout(): RedirectResponse
 {
@@ -55,14 +55,14 @@ function logout(): RedirectResponse
 
         $oidc->signOut($user->getIdToken(), null);
     } catch (OpenIDConnectClientException $e) {
-        throw new AuthException('oidc_logout_error', $e);
+        throw new OAuthException('oidc_logout_error', $e);
     }
 
     return redirect('/');
 }
 
 /**
- * @throws AuthException
+ * @throws OAuthException
  */
 function user(): ?UserModel
 {
@@ -83,22 +83,13 @@ function user(): ?UserModel
 
         return $user;
     } catch (Exception $e) {
-        throw new AuthException('oidc_refresh_error', $e);
+        throw new OAuthException('oidc_refresh_error', $e);
     }
 }
 
-/**
- * @throws AuthException
- */
 function createUserModel(string $username, string $displayName, string $idToken, string $refreshToken, array $groups): UserModel
 {
-    $user = in_array(getenv('oidc.group'), $groups);
-
-    if (!$user) {
-        throw new AuthException('noPermissions');
-    }
-
-    return new UserModel($username, $displayName, $idToken, $refreshToken);
+    return new UserModel($username, $displayName, $idToken, $refreshToken, $groups);
 }
 
 /**
@@ -113,14 +104,7 @@ function createOIDC(): OpenIDConnectClient
     );
 }
 
-function handleAuthException(BaseController $controller, AuthException $exception): string
+function isPermitted(UserModel $user): bool
 {
-    $error = lang('loginError.' . $exception->getMessage());
-
-    if ($exception->getPrevious()) {
-        $error = $error . ' (' . $exception->getPrevious()->getMessage() . ')';
-    }
-
-    // Exception can be ignored
-    return $controller->render('LoginErrorView', ['error' => $error], false);
+    return in_array(getenv('oidc.group'), $user->getGroups());
 }
