@@ -6,7 +6,7 @@ return [
         'full' => 'Abwesenheiten Waldorf Augsburg',
         'headline' => 'Abwesenheiten<br/>Waldorf Augsburg'
     ],
-    'copyright' => '&copy; 2025 Freie Waldorfschule und Waldorfkindergärten Augsburg e. V.<br><small>Entwickelt von <a href="https://linusgke.de" target="_blank">Linus Groschke</a> <br/> <a href="https://github.com/FreieWaldorfschuleAugsburg/absences" target="_blank">Quellcode auf GitHub</a> – <a href="https://waldorf-augsburg.de/impressum" target="_blank">Impressum</a></small></small>',
+    'copyright' => '&copy; %s Freie Waldorfschule und Waldorfkindergärten Augsburg e. V.<br><small>Entwickelt von <a href="https://linusgke.de" target="_blank">Linus Groschke</a> <br/> <a href="https://github.com/FreieWaldorfschuleAugsburg/absences" target="_blank">Quellcode auf GitHub</a> – <a href="https://waldorf-augsburg.de/impressum" target="_blank">Impressum</a></small></small>',
     'error' => [
         'exception' => [
             'title' => 'Systemfehler!',

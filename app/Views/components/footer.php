@@ -1,5 +1,5 @@
 <div class="text-center mt-5">
-    <p class="text-muted"><?= lang('app.copyright') ?></p>
+    <p class="text-muted"><?= sprintf(lang('app.copyright'), date("Y")) ?></p>
 </div>
 </div>
 <script src="<?= base_url('/') ?>/assets/js/popper.min.js"></script>
