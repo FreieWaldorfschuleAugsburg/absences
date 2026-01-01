@@ -19,6 +19,14 @@ return [
         '400' => [
             'title' => 'Ungültige Anfrage!',
             'text' => 'Die von Ihnen gestellte Anfrage ist ungültig.'
+        ],
+        'oauth' => [
+            'title' => 'Authentifizierungsfehler',
+            'text' => 'Bei der Authentifizierung ist ein Fehler aufgetreten.',
+            'noPermissions' => 'Sie sind nicht berechtigt dieses System zu verwenden!',
+            'login' => "OIDC-Anmeldefehler",
+            'refresh' => "OIDC-Auffrischungsfehler",
+            'logout' => "OIDC-Abmeldefehler"
         ]
     ],
     'confirm' => 'Wollen Sie das wirklich tun?'
