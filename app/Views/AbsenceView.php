@@ -52,10 +52,10 @@
             <a href="/" class="btn btn-primary btn-sm">
                 <i class="fas fa-arrow-left"></i> <?= lang('absences.group.back') ?>
             </a>
-            <a class="btn btn-primary btn-sm" href="<?= base_url('print_absent/' . $group->getName()) ?>">
+            <a class="btn btn-primary btn-sm" href="<?= base_url('print_absent/' . $group->getId()) ?>">
                 <i class="fas fa-print"></i> <?= lang('absences.group.printAbsent') ?>
             </a>
-            <a class="btn btn-primary btn-sm" href="<?= base_url('print_present/' . $group->getName()) ?>">
+            <a class="btn btn-primary btn-sm" href="<?= base_url('print_present/' . $group->getId()) ?>">
                 <i class="fas fa-print"></i> <?= lang('absences.group.printPresent') ?>
             </a>
         </div>
@@ -65,7 +65,7 @@
 <div class="row">
     <div class="col-lg-12">
         <h1>
-            <?= $group->getDisplayName() ?>
+            <?= $group->getTitle() ?>
         </h1>
         <hr>
     </div>

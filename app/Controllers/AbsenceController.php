@@ -9,9 +9,9 @@ use function App\Helpers\user;
 
 class AbsenceController extends BaseController
 {
-    public function view(string $groupName): string|RedirectResponse
+    public function view(string $id): string|RedirectResponse
     {
-        $group = findAbsenceGroupByName($groupName);
+        $group = getAbsenceGroup($id);
         if (!$group) {
             return redirect('/')->with('error', lang('absences.error.invalidGroup'));
         }
@@ -50,10 +50,10 @@ class AbsenceController extends BaseController
         return view('AbsenceView', ['group' => $group, 'entries' => $entries]);
     }
 
-    public function printAbsent(string $groupName): RedirectResponse|string
+    public function printAbsent(string $id): RedirectResponse|string
     {
         $user = user();
-        $group = findAbsenceGroupByName($groupName);
+        $group = getAbsenceGroup($id);
         if (!$group) {
             return redirect('/')->with('error', lang('absences.error.invalidGroup'));
         }

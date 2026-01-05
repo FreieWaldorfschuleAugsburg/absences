@@ -10,43 +10,37 @@ use App\Models\ProcuratPerson;
 function getAbsenceGroups(): array
 {
     $groups = [];
-
-    $groupNames = explode(',', getenv('absences.groups'));
-    foreach ($groupNames as $groupName) {
-        $displayName = getenv('absences.group.' . $groupName . '.displayName');
-        $groupIds = explode(',', getenv('absences.group.' . $groupName . '.groupIds'));
-        $udfFilterStrings = explode(',', getenv('absences.group.' . $groupName . '.udfs'));
-        $udfFilter = [];
-        foreach ($udfFilterStrings as $udfFilterString) {
-            if (!str_contains($udfFilterString, '='))
-                continue;
-
-            $key = explode('=', $udfFilterString)[0];
-            $value = explode('=', $udfFilterString)[1];
-
-            $udfFilter[$key] = $value;
-        }
-
-        $groups[] = new AbsenceGroupModel($groupName, $displayName, $groupIds, $udfFilter);
+    $ids = explode(',', getenv('absences.groups'));
+    foreach ($ids as $id) {
+        $groups[] = getAbsenceGroup($id);
     }
 
     return $groups;
 }
 
-/**
- * @param string $name
- * @return ?AbsenceGroupModel
- */
-function findAbsenceGroupByName(string $name): ?AbsenceGroupModel
+function getAbsenceGroup(string $id): ?AbsenceGroupModel
 {
-    $groups = getAbsenceGroups();
-    foreach ($groups as $group) {
-        if ($group->getName() == $name) {
-            return $group;
-        }
+    $displayName = getenv('absences.group.' . $id . '.displayName');
+    if (!$displayName) {
+        return null;
     }
 
-    return null;
+    $title = getenv('absences.group.' . $id . '.title');
+    $groupIds = preg_split('~,~', getenv('absences.group.' . $id . '.groupIds'), -1, PREG_SPLIT_NO_EMPTY);
+    $udfFilterStrings = preg_split('~,~', getenv('absences.group.' . $id . '.udfs'), -1, PREG_SPLIT_NO_EMPTY);
+    $udfFilter = [];
+    foreach ($udfFilterStrings as $udfFilterString) {
+        if (!str_contains($udfFilterString, '='))
+            continue;
+
+        $key = explode('=', $udfFilterString)[0];
+        $value = explode('=', $udfFilterString)[1];
+
+        $udfFilter[$key] = $value;
+    }
+
+    $subGroups = preg_split('~,~', getenv('absences.group.' . $id . '.subGroups'), -1, PREG_SPLIT_NO_EMPTY);
+    return new AbsenceGroupModel($id, $displayName, $title, $groupIds, $udfFilter, $subGroups);
 }
 
 /**
