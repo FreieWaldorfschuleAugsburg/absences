@@ -17,7 +17,7 @@
 </style>
 
 <h2><b><u>Anwesenheitsliste vom <?= (new DateTime())->format('d.m.Y H:i') ?> Uhr</u></b></h2>
-<b>Gruppe/Klasse:</b> <?= $group->getDisplayName() ?><br>
+<b>Gruppe/Klasse:</b> <?= $group->getTitle() ?><br>
 <b>Erstellt von:</b> <?= $user->getDisplayName() ?><br>
 
 <hr>

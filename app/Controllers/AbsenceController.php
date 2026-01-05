@@ -93,10 +93,10 @@ class AbsenceController extends BaseController
         exit;
     }
 
-    public function printPresent(string $groupName): RedirectResponse|string
+    public function printPresent(string $id): RedirectResponse|string
     {
         $user = user();
-        $group = findAbsenceGroupByName($groupName);
+        $group = getAbsenceGroup($id);
         if (!$group) {
             return redirect('/')->with('error', lang('absences.error.invalidGroup'));
         }
