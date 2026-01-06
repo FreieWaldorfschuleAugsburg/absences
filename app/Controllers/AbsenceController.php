@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\OAuthException;
 use CodeIgniter\HTTP\RedirectResponse;
 use Mpdf\Mpdf;
 use Mpdf\MpdfException;
@@ -50,6 +51,10 @@ class AbsenceController extends BaseController
         return view('AbsenceView', ['group' => $group, 'entries' => $entries]);
     }
 
+    /**
+     * @throws MpdfException
+     * @throws OAuthException
+     */
     public function printAbsent(string $id): RedirectResponse|string
     {
         $user = user();
@@ -93,6 +98,10 @@ class AbsenceController extends BaseController
         exit;
     }
 
+    /**
+     * @throws MpdfException
+     * @throws OAuthException
+     */
     public function printPresent(string $id): RedirectResponse|string
     {
         $user = user();
@@ -142,6 +151,9 @@ class AbsenceController extends BaseController
         exit;
     }
 
+    /**
+     * @throws OAuthException
+     */
     public function absent(int $personId): string|RedirectResponse
     {
         $user = user();
@@ -156,6 +168,29 @@ class AbsenceController extends BaseController
 
         createProcuratFollowUp(intval(getenv('absences.assignedPersonId')), $person->getId(), date('Y-m-d') . 'T00:00:00Z',
             'Schüler fehlt', 'Von ' . $user->getDisplayName() . ' um ' . date('H:i') . ' fehlend gemeldet');
+
+        return redirect()->back();
+    }
+
+    public function revoke(int $personId): string|RedirectResponse
+    {
+        $person = getProcuratPerson($personId);
+        if (!$person) {
+            return redirect()->back()->with('error', lang('absences.error.invalidPerson'));
+        }
+
+        if (isAbsentToday($person->getId())) {
+            return redirect()->back()->with('error', lang('absences.error.alreadyAbsent'));
+        }
+
+        $followUps = findUncompletedProcuratFollowUps($personId, 'Schüler fehlt');
+        if (empty($followUps)) {
+            return redirect()->back()->with('error', lang('absences.error.noFollowUp'));
+        }
+
+        foreach ($followUps as $followUp) {
+            deleteProcuratFollowUp($followUp->getId());
+        }
 
         return redirect()->back();
     }

@@ -162,6 +162,23 @@ function getProcuratFollowUps(): array
 }
 
 /**
+ * @param int $referencedPersonId
+ * @param string $subject
+ * @return ProcuratFollowUp[]
+ */
+function findUncompletedProcuratFollowUps(int $referencedPersonId, string $subject): array
+{
+    $followUps = [];
+    foreach (getProcuratFollowUps() as $followUp) {
+        if (!$followUp->isCompleted() && $followUp->getReferencedPersonId() == $referencedPersonId && $followUp->getSubject() == $subject) {
+            $followUps[] = $followUp;
+        }
+    }
+
+    return $followUps;
+}
+
+/**
  * @param int $assignedPersonId
  * @param int $referencedPersonId
  * @param string $dueDate
@@ -182,6 +199,15 @@ function createProcuratFollowUp(int $assignedPersonId, int $referencedPersonId, 
                 'message' => $message
             ]
         ]);
+    } catch (GuzzleException) {
+    }
+}
+
+function deleteProcuratFollowUp(int $followUpId): void
+{
+    $client = createAPIClient();
+    try {
+        $client->delete('followups/' . $followUpId);
     } catch (GuzzleException) {
     }
 }
