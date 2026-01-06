@@ -179,20 +179,20 @@ function findUncompletedProcuratFollowUps(int $referencedPersonId, string $subje
 }
 
 /**
- * @param int $assignedPersonId
+ * @param int $assignedGroupId
  * @param int $referencedPersonId
  * @param string $dueDate
  * @param string $subject
  * @param string $message
  * @return void
  */
-function createProcuratFollowUp(int $assignedPersonId, int $referencedPersonId, string $dueDate, string $subject, string $message): void
+function createProcuratFollowUp(int $assignedGroupId, int $referencedPersonId, string $dueDate, string $subject, string $message): void
 {
     $client = createAPIClient();
     try {
         $client->post('followups', [
             'json' => [
-                'assignedPersonId' => $assignedPersonId,
+                'assignedGroupId' => $assignedGroupId,
                 'referencedPersonId' => $referencedPersonId,
                 'dueDate' => $dueDate,
                 'subject' => $subject,
@@ -236,7 +236,7 @@ function constructProcuratAbsence(object $raw): ProcuratAbsence
  */
 function constructProcuratFollowUp(object $raw): ProcuratFollowup
 {
-    return new ProcuratFollowup($raw->id, $raw->dueDate, $raw->assignedPersonId, $raw->subject, $raw->message, $raw->referencedPersonId, $raw->completed);
+    return new ProcuratFollowup($raw->id, $raw->dueDate, $raw->assignedGroupId, $raw->subject, $raw->message, $raw->referencedPersonId, $raw->completed);
 }
 
 /**

@@ -8,17 +8,17 @@ class ProcuratFollowup
 {
     private int $id;
     private string $dueDate;
-    private int $assignedPersonId;
+    private ?int $assignedGroupId;
     private string $subject;
     private string $message;
     private ?int $referencedPersonId;
     private bool $completed;
 
-    function __construct($id, $dueDate, $assignedPersonId, $subject, $message, $referencedPersonId, $completed)
+    function __construct($id, $dueDate, $assignedGroupId, $subject, $message, $referencedPersonId, $completed)
     {
         $this->id = $id;
         $this->dueDate = $dueDate;
-        $this->assignedPersonId = $assignedPersonId;
+        $this->assignedGroupId = $assignedGroupId;
         $this->subject = $subject;
         $this->message = $message;
         $this->referencedPersonId = $referencedPersonId;

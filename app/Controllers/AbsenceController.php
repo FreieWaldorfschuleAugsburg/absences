@@ -166,7 +166,7 @@ class AbsenceController extends BaseController
             return redirect()->back()->with('error', lang('absences.error.alreadyAbsent'));
         }
 
-        createProcuratFollowUp(intval(getenv('absences.assignedPersonId')), $person->getId(), date('Y-m-d') . 'T00:00:00Z',
+        createProcuratFollowUp(intval(getenv('absences.assignedGroupId')), $person->getId(), date('Y-m-d') . 'T00:00:00Z',
             'Schüler fehlt', 'Von ' . $user->getDisplayName() . ' um ' . date('H:i') . ' fehlend gemeldet');
 
         return redirect()->back();
