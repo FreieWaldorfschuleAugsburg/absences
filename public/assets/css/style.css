@@ -15,10 +15,6 @@ body {
     background-color: rgb(15 23 42) !important;
 }
 
-/*.card {
-    background-color: #141e37 !important;
-}*/
-
 .navbar {
     background-color: rgb(24, 33, 55) !important;
 }
@@ -34,4 +30,16 @@ body {
 .blurred {
     color: transparent !important;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.bg-green {
+    background-color: green;
+}
+
+.bg-orange {
+    background-color: #FF5C00;
+}
+
+.bg-red {
+    background-color: darkred;
 }

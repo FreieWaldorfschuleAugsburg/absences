@@ -1,33 +1,3 @@
-<style>
-    @media (prefers-color-scheme: dark) {
-        .bg-green {
-            background-color: green;
-        }
-
-        .bg-orange {
-            background-color: #FF5C00;
-        }
-
-        .bg-red {
-            background-color: darkred;
-        }
-    }
-
-    @media (prefers-color-scheme: light) {
-        .bg-green {
-            background-color: #88e788;
-        }
-
-        .bg-orange {
-            background-color: #ffc067;
-        }
-
-        .bg-red {
-            background-color: #ff746c;
-        }
-    }
-</style>
-
 <div class="row mt-3 justify-content-center">
     <div class="col-lg-12">
         <?= isset($error) ? '<div class="alert alert-danger mb-3"> <i class="fas fa-exclamation-triangle"></i> <b>' . lang('index.error') . '</b> ' . $error . '</div>' : '' ?>

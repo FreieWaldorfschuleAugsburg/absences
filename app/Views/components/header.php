@@ -1,8 +1,3 @@
-<?php
-
-use function App\Helpers\user;
-
-?>
 <!DOCTYPE html>
 <html lang="<?= service('request')->getLocale(); ?>" data-bs-theme="dark">
 
@@ -12,11 +7,11 @@ use function App\Helpers\user;
 
     <title><?= lang('app.name.short') ?></title>
 
-    <link href="<?= base_url('/') ?>/assets/img/logo.png" rel="icon">
-    <link href="<?= base_url('/') ?>/assets/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="<?= base_url('/') ?>/assets/css/fontawesome.min.css"/>
+    <link href="<?= base_url('/') ?>assets/img/logo.png" rel="icon">
+    <link href="<?= base_url('/') ?>assets/css/bootstrap.min.css?build=1768163594032" rel="stylesheet">
+    <link rel="stylesheet" href="<?= base_url('/') ?>assets/css/fontawesome.min.css?build=1768163594032"/>
 
-    <link href="<?= base_url('/') ?>/assets/css/style.css" rel="stylesheet">
+    <link href="<?= base_url('/') ?>assets/css/style.css?build=1768163594032" rel="stylesheet">
 
     <!-- Matomo -->
     <script>
@@ -29,7 +24,7 @@ use function App\Helpers\user;
             _paq.push(['setTrackerUrl', u + 'matomo.php']);
             _paq.push(['setSiteId', '9']);
 
-            <?php if (function_exists('user') && $user = user()): ?>
+            <?php if ($user): ?>
             _paq.push(['setUserId', '<?= $user->getUsername() ?>'])
             <?php endif; ?>
 
