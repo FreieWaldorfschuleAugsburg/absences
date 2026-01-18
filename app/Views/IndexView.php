@@ -1,10 +1,3 @@
-<div class="row mt-3 justify-content-center">
-    <div class="col-lg-12">
-        <?= isset($error) ? '<div class="alert alert-danger mb-3"> <i class="fas fa-exclamation-triangle"></i> ' . $error . '</div>' : '' ?>
-        <?= !empty(session('error')) ? '<div class="alert alert-danger mb-3"> <i class="fas fa-exclamation-triangle"></i> ' . session('error') . '</div>' : '' ?>
-    </div>
-</div>
-
 <?php if ($user->isStaff()) : ?>
     <?php
     $isSchoolDay = date('N') < 6;

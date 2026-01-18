@@ -23,7 +23,7 @@ return [
         'oauth' => [
             'title' => 'Authentifizierungsfehler',
             'text' => 'Bei der Authentifizierung ist ein Fehler aufgetreten.',
-            'noPermissions' => 'Sie sind nicht berechtigt dieses System zu verwenden!',
+            'noPermissions' => 'Sie sind hierzu nicht berechtigt.',
             'login' => "OIDC-Anmeldefehler",
             'refresh' => "OIDC-Auffrischungsfehler",
             'logout' => "OIDC-Abmeldefehler"

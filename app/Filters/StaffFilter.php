@@ -24,7 +24,7 @@ class StaffFilter implements FilterInterface
         }
 
         if (!$user->isStaff()) {
-            throw new OAuthException('noPermissions');
+            return redirect('/')->with('error', lang('app.error.oauth.noPermissions'));
         }
     }
 
