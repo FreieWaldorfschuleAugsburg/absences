@@ -27,7 +27,9 @@ return [
             'login' => "OIDC-Anmeldefehler",
             'refresh' => "OIDC-Auffrischungsfehler",
             'logout' => "OIDC-Abmeldefehler"
-        ]
+        ],
+        'portalHyperlink' => 'Portal aufrufen',
+        'logoutHyperlink' => 'Abmelden'
     ],
     'confirm' => 'Wollen Sie das wirklich tun?'
 ];

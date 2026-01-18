@@ -103,8 +103,3 @@ function createOIDC(): OpenIDConnectClient
         getenv('oidc.clientSecret')
     );
 }
-
-function isPermitted(UserModel $user): bool
-{
-    return in_array(getenv('oidc.group'), $user->getGroups());
-}

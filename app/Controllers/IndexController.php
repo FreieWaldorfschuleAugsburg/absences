@@ -5,13 +5,16 @@ namespace App\Controllers;
 use App\Models\OAuthException;
 use CodeIgniter\HTTP\RedirectResponse;
 use function App\Helpers\logout;
+use function App\Helpers\user;
 
 class IndexController extends BaseController
 {
+    /**
+     * @throws OAuthException
+     */
     public function index(): string
     {
-        $groups = getAbsenceGroups();
-        return view('IndexView', ['groups' => $groups]);
+        return view('IndexView', ['user' => user(), 'groups' => getAbsenceGroups()]);
     }
 
     /**

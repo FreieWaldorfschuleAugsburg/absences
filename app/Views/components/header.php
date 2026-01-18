@@ -24,7 +24,7 @@
             _paq.push(['setTrackerUrl', u + 'matomo.php']);
             _paq.push(['setSiteId', '9']);
 
-            <?php if ($user): ?>
+            <?php if (isset($user)): ?>
             _paq.push(['setUserId', '<?= $user->getUsername() ?>'])
             <?php endif; ?>
 

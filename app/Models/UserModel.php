@@ -43,4 +43,9 @@ class UserModel
     {
         return $this->groups;
     }
+
+    public function isStaff(): bool
+    {
+        return in_array(getenv('oidc.group'), $this->getGroups());
+    }
 }

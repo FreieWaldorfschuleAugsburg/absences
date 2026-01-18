@@ -9,7 +9,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use function App\Helpers\login;
 use function App\Helpers\user;
 
-class LoginFilter implements FilterInterface
+class StaffFilter implements FilterInterface
 {
     /**
      * @throws OAuthException
@@ -21,6 +21,10 @@ class LoginFilter implements FilterInterface
         $user = user();
         if (is_null($user)) {
             return login();
+        }
+
+        if (!$user->isStaff()) {
+            throw new OAuthException('noPermissions');
         }
     }
 
