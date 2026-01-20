@@ -58,13 +58,13 @@
                     </div>
                     <div class="card-footer">
                         <?php if ($entry['halfDay']): ?>
-                            <button class="btn btn-primary btn-sm"
-                                    onclick="confirmRedirect('<?= base_url('absent/') . '?id=' . $entry['person']->getId() ?>')">
-                                <i class="fas fa-person-running"></i> <?= lang('absences.group.reportAbsent') ?>
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="confirmRedirect('<?= base_url('report_missing/') . '?id=' . $entry['person']->getId() ?>')">
+                                <i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>
                             </button>
                         <?php else: ?>
-                            <button class="btn btn-primary btn-sm" disabled>
-                                <i class="fas fa-person-running"></i> <?= lang('absences.group.reportAbsent') ?>
+                            <button class="btn btn-danger btn-sm" disabled>
+                                <i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>
                             </button>
                         <?php endif; ?>
                     </div>
@@ -85,13 +85,13 @@
                     </div>
                     <div class="card-footer">
                         <button class="btn btn-danger btn-sm"
-                                onclick="confirmRedirect('<?= base_url('absent/') . $entry['person']->getId() ?>')">
-                            <i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportAbsent') ?>
+                                onclick="confirmRedirect('<?= base_url('report_missing/') . $entry['person']->getId() ?>')">
+                            <i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>
                         </button>
                         <?php if (key_exists('followUp', $entry)): ?>
                             <button class="btn btn-success btn-sm"
-                                    onclick="confirmRedirect('<?= base_url('revoke/') . $entry['person']->getId() ?>')">
-                                <i class="fas fa-person-circle-check"></i> <?= lang('absences.group.revokeAbsent') ?>
+                                    onclick="confirmRedirect('<?= base_url('revoke_missing/') . $entry['person']->getId() ?>')">
+                                <i class="fas fa-person-circle-check"></i> <?= lang('absences.group.revokeMissing') ?>
                             </button>
                         <?php endif; ?>
                     </div>
