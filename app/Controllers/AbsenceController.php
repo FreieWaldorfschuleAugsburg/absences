@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Models\OAuthException;
 use CodeIgniter\HTTP\RedirectResponse;
-use Mpdf\Mpdf;
 use Mpdf\MpdfException;
 use function App\Helpers\user;
 
@@ -38,7 +37,8 @@ class AbsenceController extends BaseController
             }
 
             foreach ($followUps as $followUp) {
-                if ($followUp->getReferencedPersonId() == $member->getId() && $followUp->getSubject() == 'Schüler fehlt') {
+                if ($followUp->getReferencedPersonId() == $member->getId()
+                    && $followUp->getSubject() == 'Schüler fehlt' && isFollowUpToday($followUp)) {
                     $entry['followUp'] = true;
                     $entry['note'] = $followUp->getMessage();
                     break;
@@ -57,6 +57,8 @@ class AbsenceController extends BaseController
      */
     public function printAbsent(string $id): RedirectResponse|string
     {
+        helper('mpdf');
+
         $user = user();
         $group = getAbsenceGroup($id);
         if (!$group) {
@@ -80,7 +82,8 @@ class AbsenceController extends BaseController
             }
 
             foreach ($followUps as $followUp) {
-                if ($followUp->getReferencedPersonId() == $member->getId() && $followUp->getSubject() == 'Schüler fehlt') {
+                if ($followUp->getReferencedPersonId() == $member->getId() && $followUp->getSubject() == 'Schüler fehlt'
+                    && isFollowUpToday($followUp)) {
                     $entry['absent'] = true;
                     $entry['note'] = $followUp->getMessage();
                     break;
@@ -92,7 +95,7 @@ class AbsenceController extends BaseController
             }
         }
 
-        $mpdf = $this->createMPDF();
+        $mpdf = createMPDF();
         $mpdf->WriteHTML(view('print/AbsentPrintView', ['user' => $user, 'group' => $group, 'entries' => $entries]));
         $mpdf->Output();
         exit;
@@ -104,6 +107,8 @@ class AbsenceController extends BaseController
      */
     public function printPresent(string $id): RedirectResponse|string
     {
+        helper('mpdf');
+
         $user = user();
         $group = getAbsenceGroup($id);
         if (!$group) {
@@ -135,7 +140,7 @@ class AbsenceController extends BaseController
             }
 
             foreach ($followUps as $followUp) {
-                if ($followUp->getReferencedPersonId() == $member->getId() && $followUp->getSubject() == 'Schüler fehlt') {
+                if ($followUp->getReferencedPersonId() == $member->getId() && $followUp->getSubject() == 'Schüler fehlt' && isFollowUpToday($followUp)) {
                     $entry['absent'] = true;
                     $entry['note'] = $followUp->getMessage();
                     break;
@@ -145,7 +150,7 @@ class AbsenceController extends BaseController
             $entries[] = $entry;
         }
 
-        $mpdf = $this->createMPDF();
+        $mpdf = createMPDF();
         $mpdf->WriteHTML(view('print/PresentPrintView', ['user' => $user, 'group' => $group, 'entries' => $entries]));
         $mpdf->Output();
         exit;
@@ -193,24 +198,5 @@ class AbsenceController extends BaseController
         }
 
         return redirect()->back();
-    }
-
-    /**
-     * @throws MpdfException
-     */
-    private function createMPDF(): Mpdf
-    {
-        $mpdf = new Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'margin_left' => 19,
-            'margin_right' => 19,
-            'margin_top' => 14,
-            'margin_bottom' => 45,
-            'margin_header' => 19,
-            'margin_footer' => 19,
-            'orientation' => 'P']);
-        $mpdf->setHTMLFooter(view('print/PrintFooter'));
-        return $mpdf;
     }
 }

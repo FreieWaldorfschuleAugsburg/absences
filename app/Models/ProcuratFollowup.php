@@ -34,11 +34,11 @@ class ProcuratFollowup
     }
 
     /**
-     * @return DateTime
+     * @return array
      */
-    public function getDueDate(): string
+    public function getDueDate(): array
     {
-        return $this->dueDate;
+        return date_parse_from_format('Y-m-d\TH:i:s+', $this->dueDate);
     }
 
     /**
