@@ -67,35 +67,7 @@ class AbsenceController extends BaseController
             return redirect('/')->with('error', lang('absences.error.invalidGroup'));
         }
 
-        $entries = [];
-        $members = findAbsenceGroupMembers($group);
-        $absences = getProcuratAbsences();
-        $followUps = getProcuratFollowUps();
 
-        foreach ($members as $member) {
-            $entry = ['person' => $member];
-
-            foreach ($absences as $absence) {
-                if ($absence->getPersonId() == $member->getId() && $absence->isExcused()) {
-                    $entry['absent'] = true;
-                    $entry['note'] = $absence->getNote();
-                    break;
-                }
-            }
-
-            foreach ($followUps as $followUp) {
-                if ($followUp->getReferencedPersonId() == $member->getId() && $followUp->getSubject() == 'Schüler fehlt'
-                    && isFollowUpToday($followUp)) {
-                    $entry['absent'] = true;
-                    $entry['note'] = $followUp->getMessage();
-                    break;
-                }
-            }
-
-            if (key_exists('absent', $entry)) {
-                $entries[] = $entry;
-            }
-        }
 
         $mpdf = createMPDF();
         $mpdf->WriteHTML(view('print/AbsentPrintView', ['user' => $user, 'group' => $group, 'entries' => $entries]));
