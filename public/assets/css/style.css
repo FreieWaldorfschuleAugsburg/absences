@@ -43,3 +43,7 @@ body {
 .bg-red {
     background-color: darkred;
 }
+
+.absence-card-footer {
+    min-height: 48px;
+}

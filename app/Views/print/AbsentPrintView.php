@@ -28,9 +28,6 @@
             Schüler/in
         </th>
         <th>
-            Klasse
-        </th>
-        <th>
             Bemerkung
         </th>
     </tr>
@@ -40,9 +37,7 @@
                 <?= $entry['person']->getLastName() . ', ' . $entry['person']->getFirstName() ?>
             </td>
             <td>
-            </td>
-            <td>
-                <?= $entry['note'] ?>
+                <?= $entry['note'] ?? '' ?>
             </td>
         </tr>
     <?php endforeach; ?>

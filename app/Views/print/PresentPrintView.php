@@ -30,9 +30,6 @@
             Schüler/in
         </th>
         <th>
-            Klasse
-        </th>
-        <th>
             Unterschrift Schüler/in
         </th>
     </tr>
@@ -40,12 +37,9 @@
         <tr>
             <td>
                 <b><?= $entry['person']->getLastName() . ', ' . $entry['person']->getFirstName() ?></b>
-                <?php if (key_exists('absent', $entry)): ?>
+                <?php if (key_exists('note', $entry)): ?>
                     <br><span style="font-size: 10px">Bemerkung: <?= $entry['note'] ?></span>
                 <?php endif; ?>
-            </td>
-            <td>
-
             </td>
             <td>
 

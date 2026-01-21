@@ -1,3 +1,8 @@
+<?php
+
+use App\Models\EntryStatus;
+
+?>
 <div class="row mt-3 justify-content-center">
     <div class="col-lg-12">
         <?= isset($error) ? '<div class="alert alert-danger mb-3"> <i class="fas fa-exclamation-triangle"></i> <b>' . lang('index.error') . '</b> ' . $error . '</div>' : '' ?>
@@ -43,61 +48,35 @@
 
 <div class="row">
     <?php foreach ($entries as $entry) : ?>
-        <?php if (key_exists('absent', $entry)): ?>
-            <div class="col-lg-4">
-                <div class="card <?= $entry['halfDay'] ? 'bg-orange' : 'bg-red' ?> mb-3">
-                    <div class="card-body">
-                        <h5><?= $entry['person']->getFullName() ?></h5>
-                        <?php if (key_exists('note', $entry)): ?>
-                            <small><b><?= lang('absences.group.note') ?></b></small><small
-                                    onmouseenter="blurText(this, false)" onmouseleave="blurText(this, true)"
-                                    class="blurred"> <?= $entry['note'] ?></small>
-                        <?php else: ?>
-                            <small>&nbsp;</small>
-                        <?php endif; ?>
-                    </div>
-                    <div class="card-footer">
-                        <?php if ($entry['halfDay']): ?>
-                            <button class="btn btn-danger btn-sm"
-                                    onclick="confirmRedirect('<?= base_url('report_missing/') . '?id=' . $entry['person']->getId() ?>')">
-                                <i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>
-                            </button>
-                        <?php else: ?>
-                            <button class="btn btn-danger btn-sm" disabled>
-                                <i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>
-                            </button>
-                        <?php endif; ?>
-                    </div>
+        <div class="col-lg-4">
+            <div class="card <?= $entry['status']->getBackgroundColorClass() ?> mb-3">
+                <div class="card-body">
+                    <h5><?= $entry['person']->getFullName() ?></h5>
+                    <?php if (key_exists('note', $entry)): ?>
+                        <small><b><?= lang('absences.group.note') ?></b></small><small
+                                onmouseenter="blurText(this, false)" onmouseleave="blurText(this, true)"
+                                class="blurred"> <?= $entry['note'] ?></small>
+                    <?php else: ?>
+                        <small>&nbsp;</small>
+                    <?php endif; ?>
                 </div>
-            </div>
-        <?php else: ?>
-            <div class="col-lg-4">
-                <div class="card <?= key_exists('followUp', $entry) ? 'bg-orange' : 'bg-green' ?> mb-3">
-                    <div class="card-body">
-                        <h5><?= $entry['person']->getFullName() ?></h5>
-                        <?php if (key_exists('followUp', $entry)): ?>
-                            <small><b><?= lang('absences.group.note') ?></b></small>
-                            <small onmouseenter="blurText(this, false)" onmouseleave="blurText(this, true)"
-                                   class="blurred"> <?= $entry['note'] ?></small>
-                        <?php else: ?>
-                            <small>&nbsp;</small>
-                        <?php endif; ?>
-                    </div>
-                    <div class="card-footer">
+                <div class="card-footer absence-card-footer">
+                    <?php if ($entry['status'] != EntryStatus::Absent && $entry['status'] != EntryStatus::Missing): ?>
                         <button class="btn btn-danger btn-sm"
                                 onclick="confirmRedirect('<?= base_url('report_missing/') . $entry['person']->getId() ?>')">
                             <i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>
                         </button>
-                        <?php if (key_exists('followUp', $entry)): ?>
-                            <button class="btn btn-success btn-sm"
-                                    onclick="confirmRedirect('<?= base_url('revoke_missing/') . $entry['person']->getId() ?>')">
-                                <i class="fas fa-person-circle-check"></i> <?= lang('absences.group.revokeMissing') ?>
-                            </button>
-                        <?php endif; ?>
-                    </div>
+                    <?php endif; ?>
+
+                    <?php if ($entry['status'] == EntryStatus::Missing): ?>
+                        <button class="btn btn-success btn-sm"
+                                onclick="confirmRedirect('<?= base_url('revoke_missing/') . $entry['person']->getId() ?>')">
+                            <i class="fas fa-person-circle-check"></i> <?= lang('absences.group.revokeMissing') ?>
+                        </button>
+                    <?php endif; ?>
                 </div>
             </div>
-        <?php endif; ?>
+        </div>
     <?php endforeach; ?>
 </div>
 

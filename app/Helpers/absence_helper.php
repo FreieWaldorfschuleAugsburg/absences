@@ -1,41 +1,35 @@
 <?php
 
 use App\Models\AbsenceGroupModel;
+use App\Models\EntryStatus;
+use App\Models\ProcuratAbsence;
+use App\Models\ProcuratFollowup;
 use Mpdf\MpdfException;
 use function App\Helpers\user;
 
 /**
+ * @param AbsenceGroupModel $group
+ * @param string $view
+ * @param EntryStatus[] $ignoreStatus
+ * @return void
  * @throws MpdfException
  * @throws \App\Models\OAuthException
  */
-function renderAbsencesPDF(AbsenceGroupModel $group): void
-{
-    renderPDF($group, 'print/AbsentPrintView', true);
-}
-
-/**
- * @throws MpdfException
- * @throws \App\Models\OAuthException
- */
-function renderPresentPDF(AbsenceGroupModel $group): void
-{
-    renderPDF($group, 'print/PresentPrintView', false);
-}
-
-/**
- * @throws MpdfException
- * @throws \App\Models\OAuthException
- */
-function renderPDF(AbsenceGroupModel $group, string $view, bool $absentOnly): void
+function renderPDF(AbsenceGroupModel $group, string $view, array $ignoreStatus): void
 {
     helper('mpdf');
 
     $mpdf = createMPDF();
-    $mpdf->WriteHTML(view($view, ['user' => user(), 'group' => $group, 'entries' => generateEntries($group, $absentOnly)]));
+    $mpdf->WriteHTML(view($view, ['user' => user(), 'group' => $group, 'entries' => generateEntries($group, $ignoreStatus)]));
     $mpdf->Output();
 }
 
-function generateEntries(AbsenceGroupModel $group, bool $absentOnly): array
+/**
+ * @param AbsenceGroupModel $group
+ * @param EntryStatus[] $ignoreStatus
+ * @return array
+ */
+function generateEntries(AbsenceGroupModel $group, array $ignoreStatus): array
 {
     $entries = [];
 
@@ -44,37 +38,65 @@ function generateEntries(AbsenceGroupModel $group, bool $absentOnly): array
     $followUps = getProcuratFollowUps();
 
     foreach ($members as $member) {
-        $entry = ['person' => $member];
+        $entry = ['person' => $member, 'status' => EntryStatus::Present];
 
-        foreach ($absences as $absence) {
-            if ($absence->getPersonId() == $member->getId() && $absence->isExcused()) {
-                $entry['absent'] = true;
-                $entry['halfDay'] = isHalfDayAbsence($absence);
-                $entry['note'] = $absence->getNote();
-                break;
+        $absence = findAbsenceByPersonId($absences, $member->getId());
+        if ($absence) {
+            $entry['status'] = isHalfDayAbsence($absence) ? EntryStatus::HalfDay : EntryStatus::Absent;
+            $note = $absence->getNote();
+            if (strlen($note) > 0) {
+                $entry['note'] = $note;
+            }
+        } else {
+            $followUp = findFollowUpByPersonId($followUps, $member->getId());
+            if ($followUp) {
+                $entry['status'] = EntryStatus::Missing;
+                $entry['note'] = $followUp->getMessage();
             }
         }
 
-        if (key_exists('absent', $entry)) {
+        if (in_array($entry['status'], $ignoreStatus)) {
             continue;
         }
 
-
-        if (key_exists('absent', $entry)) {
-            foreach ($followUps as $followUp) {
-                if ($followUp->getReferencedPersonId() == $member->getId() && $followUp->getSubject() == 'Schüler fehlt'
-                    && isFollowUpToday($followUp)) {
-                    $entry['absent'] = true;
-                    $entry['note'] = $followUp->getMessage();
-                    break;
-                }
-            }
-        }
-
-        if (key_exists('absent', $entry)) {
-            $entries[] = $entry;
-        }
+        $entries[] = $entry;
     }
 
     return $entries;
+}
+
+/**
+ * @param ProcuratAbsence[] $absences
+ * @param int $personId
+ * @return ProcuratAbsence|null
+ *
+ */
+function findAbsenceByPersonId(array $absences, int $personId): ?ProcuratAbsence
+{
+    foreach ($absences as $absence) {
+        // Only match if excused
+        if ($absence->getPersonId() == $personId && $absence->isExcused()) {
+            return $absence;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * @param ProcuratFollowup[] $followUps
+ * @param int $personId
+ * @return ProcuratFollowup|null
+ */
+function findFollowUpByPersonId(array $followUps, int $personId): ?ProcuratFollowup
+{
+    foreach ($followUps as $followUp) {
+        // Only match uncompleted with correct subject
+        if (!$followUp->isCompleted() && $followUp->getReferencedPersonId() == $personId
+            && isFollowUpToday($followUp) && $followUp->getSubject() == 'Schüler fehlt') {
+            return $followUp;
+        }
+    }
+
+    return null;
 }
