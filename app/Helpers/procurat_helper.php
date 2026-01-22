@@ -162,23 +162,6 @@ function getProcuratFollowUps(): array
 }
 
 /**
- * @param int $referencedPersonId
- * @param string $subject
- * @return ProcuratFollowUp[]
- */
-function findUncompletedProcuratFollowUps(int $referencedPersonId, string $subject): array
-{
-    $followUps = [];
-    foreach (getProcuratFollowUps() as $followUp) {
-        if (!$followUp->isCompleted() && $followUp->getReferencedPersonId() == $referencedPersonId && $followUp->getSubject() == $subject) {
-            $followUps[] = $followUp;
-        }
-    }
-
-    return $followUps;
-}
-
-/**
  * @param int $assignedGroupId
  * @param int $referencedPersonId
  * @param string $dueDate

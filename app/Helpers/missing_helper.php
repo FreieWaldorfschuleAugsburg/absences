@@ -5,6 +5,22 @@ use App\Models\InvalidPersonException;
 use App\Models\ProcuratFollowup;
 
 /**
+ * @throws \PHPMailer\PHPMailer\Exception
+ */
+function sendUncompletedFollowUpReminder(): void
+{
+    helper('mail');
+    $followUps = findUncompletedAbsenceFollowUps();
+    if (empty($followUps)) {
+        return;
+    }
+
+    $subject = sprintf("%s aussthende Meldung(en)", count($followUps));
+    sendGenericMail([getenv('absences.reminderEmail')], $subject, $subject,
+        "Prüfe bitte die ausstehenden Meldungen in Procurat!5 unter 'Wiedervorlagen' und markiere sie ggf. als erledigt.");
+}
+
+/**
  * @throws InvalidPersonException
  * @throws AlreadyAbsentException
  */
@@ -33,10 +49,32 @@ function revokeMissing(int $personId): void
         throw new InvalidPersonException();
     }
 
-    $followUps = findUncompletedProcuratFollowUps($personId, 'Schüler fehlt');
+    $followUps = findUncompletedAbsenceFollowUpsByPersonId($personId);
     foreach ($followUps as $followUp) {
         deleteProcuratFollowUp($followUp->getId());
     }
+}
+
+function findUncompletedAbsenceFollowUps(): array
+{
+    $followUps = [];
+    foreach (getProcuratFollowUps() as $followUp) {
+        if (!$followUp->isCompleted() && $followUp->getSubject() == 'Schüler fehlt') {
+            $followUps[] = $followUp;
+        }
+    }
+    return $followUps;
+}
+
+function findUncompletedAbsenceFollowUpsByPersonId(int $personId): array
+{
+    $followUps = [];
+    foreach (getProcuratFollowUps() as $followUp) {
+        if (!$followUp->isCompleted() && $followUp->getReferencedPersonId() == $personId && $followUp->getSubject() == 'Schüler fehlt') {
+            $followUps[] = $followUp;
+        }
+    }
+    return $followUps;
 }
 
 function isFollowUpToday(ProcuratFollowUp $followUp): bool

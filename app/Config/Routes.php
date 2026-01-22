@@ -15,3 +15,5 @@ $routes->get('/revoke_missing/(:any)', 'MissingController::revokeMissing/$1', ['
 
 $routes->get('/print_absent/(:any)', 'AbsenceController::printAbsent/$1', ['filter' => ['staff', 'components']]);
 $routes->get('/print_present/(:any)', 'AbsenceController::printPresent/$1', ['filter' => ['staff', 'components']]);
+
+$routes->cli('/cron_reminder', 'MissingController::cronFollowUpReminder');

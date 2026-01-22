@@ -6,7 +6,7 @@ use App\Models\AlreadyAbsentException;
 use App\Models\InvalidPersonException;
 use App\Models\OAuthException;
 use CodeIgniter\HTTP\RedirectResponse;
-use Mpdf\MpdfException;
+use PHPMailer\PHPMailer\Exception;
 use function App\Helpers\user;
 
 class MissingController extends BaseController
@@ -36,5 +36,13 @@ class MissingController extends BaseController
         } catch (InvalidPersonException) {
             return redirect()->back()->with('error', lang('absences.error.invalidPerson'));
         }
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function cronFollowUpReminder(): void
+    {
+        sendUncompletedFollowUpReminder();
     }
 }
