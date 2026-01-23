@@ -15,7 +15,20 @@ function sendUncompletedFollowUpReminder(): void
         return;
     }
 
-    $subject = sprintf("%s aussthende Meldung(en)", count($followUps));
+    $count = 0;
+    foreach ($followUps as $followUp) {
+        if (isAbsentToday($followUp->getReferencedPersonId())) {
+            continue;
+        }
+
+        $count++;
+    }
+
+    if ($count == 0) {
+        return;
+    }
+
+    $subject = sprintf("%s aussthende Meldung(en)", $count);
     sendGenericMail([getenv('absences.reminderEmail')], $subject, $subject,
         "Prüfe bitte die ausstehenden Meldungen in Procurat!5 unter 'Wiedervorlagen' und markiere sie ggf. als erledigt.");
 }
@@ -55,6 +68,9 @@ function revokeMissing(int $personId): void
     }
 }
 
+/**
+ * @return ProcuratFollowup[]
+ */
 function findUncompletedAbsenceFollowUps(): array
 {
     $followUps = [];
@@ -66,6 +82,10 @@ function findUncompletedAbsenceFollowUps(): array
     return $followUps;
 }
 
+/**
+ * @param int $personId
+ * @return ProcuratFollowup[]
+ */
 function findUncompletedAbsenceFollowUpsByPersonId(int $personId): array
 {
     $followUps = [];
