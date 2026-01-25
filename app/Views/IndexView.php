@@ -7,7 +7,7 @@
                 </div>
                 <div class="card-body">
                     <?= form_open() ?>
-                    <label for="inputPerson" class="form-label">Person</label>
+                    <label for="inputPerson" class="form-label">Kind</label>
                     <div class="input-group mb-3">
                         <select class="form-select" id="inputPerson" name="person" required>
                             <?php foreach ($reportablePersons as $person) : ?>
