@@ -17,7 +17,7 @@ function sendUncompletedFollowUpReminder(): void
 
     $count = 0;
     foreach ($followUps as $followUp) {
-        if (isAbsentToday($followUp->getReferencedPersonId())) {
+        if (($absence = getAbsenceToday($followUp->getReferencedPersonId())) && !isHalfDayAbsence($absence)) {
             deleteProcuratFollowUp($followUp->getId());
             continue;
         }
