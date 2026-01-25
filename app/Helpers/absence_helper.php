@@ -4,8 +4,32 @@ use App\Models\AbsenceGroupModel;
 use App\Models\EntryStatus;
 use App\Models\ProcuratAbsence;
 use App\Models\ProcuratFollowup;
+use App\Models\ProcuratPerson;
 use Mpdf\MpdfException;
 use function App\Helpers\user;
+
+/**
+ * @param int $personId
+ * @return ProcuratPerson[]
+ */
+function findReportablePersons(int $personId): array
+{
+    $persons = [];
+    $ownPerson = getProcuratPerson($personId);
+    // TODO find better criteria
+    if ($ownPerson->isAdult() && $ownPerson->getFamilyRole() == 'child') {
+        $persons[] = $ownPerson;
+    }
+
+    $relationships = getProcuratRelationships($personId);
+    foreach ($relationships as $relationship) {
+        if ($relationship->getRelationshipType() == 'son' || $relationship->getRelationshipType() == 'daughter') {
+            $persons[] = getProcuratPerson($relationship->getPersonId());
+        }
+    }
+
+    return $persons;
+}
 
 /**
  * @param AbsenceGroupModel $group

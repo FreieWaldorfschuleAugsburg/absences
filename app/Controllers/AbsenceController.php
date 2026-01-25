@@ -6,6 +6,7 @@ use App\Models\EntryStatus;
 use App\Models\OAuthException;
 use CodeIgniter\HTTP\RedirectResponse;
 use Mpdf\MpdfException;
+use function App\Helpers\user;
 
 class AbsenceController extends BaseController
 {

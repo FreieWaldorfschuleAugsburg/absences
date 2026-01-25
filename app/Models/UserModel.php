@@ -6,14 +6,16 @@ class UserModel
 {
     private string $username;
     private string $displayName;
+    private ?int $procuratId;
     private string $idToken;
     private string $refreshToken;
     private array $groups;
 
-    function __construct($username, $displayName, $idToken, $refreshToken, $groups)
+    function __construct($username, $displayName, $procuratId, $idToken, $refreshToken, $groups)
     {
         $this->username = $username;
         $this->displayName = $displayName;
+        $this->procuratId = $procuratId;
         $this->idToken = $idToken;
         $this->refreshToken = $refreshToken;
         $this->groups = $groups;
@@ -27,6 +29,14 @@ class UserModel
     public function getDisplayName(): string
     {
         return $this->displayName;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getProcuratId(): ?int
+    {
+        return $this->procuratId;
     }
 
     public function getIdToken(): string

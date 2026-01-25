@@ -4,6 +4,7 @@ use App\Models\ProcuratAbsence;
 use App\Models\ProcuratFollowup;
 use App\Models\ProcuratGroupMembership;
 use App\Models\ProcuratPerson;
+use App\Models\ProcuratRelationship;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
@@ -53,7 +54,7 @@ function getProcuratPerson(int $id): ?ProcuratPerson
     $client = createAPIClient();
     try {
         $response = decodeResponse($client->get('persons/' . $id));
-        return new ProcuratPerson($response->id, $response->firstName, $response->lastName);
+        return constructProcuratPerson($response);
     } catch (GuzzleException) {
         return null;
     }
@@ -69,7 +70,7 @@ function getAllProcuratPersons(): array
     try {
         $rawPersons = decodeResponse($client->get('persons'));
         foreach ($rawPersons as $rawPerson) {
-            $persons[] = new ProcuratPerson($rawPerson->id, $rawPerson->firstName, $rawPerson->lastName);
+            $persons[] = constructProcuratPerson($rawPerson);
         }
     } catch (GuzzleException) {
     }
@@ -196,6 +197,33 @@ function deleteProcuratFollowUp(int $followUpId): void
 }
 
 /**
+ * @param int $personId
+ * @return ProcuratRelationship[]
+ */
+function getProcuratRelationships(int $personId): array
+{
+    $client = createAPIClient();
+    $relationships = [];
+    try {
+        $rawRelationships = decodeResponse($client->get('relationships/person/' . $personId));
+        foreach ($rawRelationships as $raw) {
+            $relationships[] = constructProcuratRelationship($raw);
+        }
+    } catch (GuzzleException) {
+    }
+    return $relationships;
+}
+
+/**
+ * @param object $raw
+ * @return ProcuratPerson
+ */
+function constructProcuratPerson(object $raw): ProcuratPerson
+{
+    return new ProcuratPerson($raw->id, $raw->firstName, $raw->lastName, $raw->birthDate, $raw->familyRole);
+}
+
+/**
  * @param object $raw
  * @return ProcuratGroupMembership
  */
@@ -220,6 +248,15 @@ function constructProcuratAbsence(object $raw): ProcuratAbsence
 function constructProcuratFollowUp(object $raw): ProcuratFollowup
 {
     return new ProcuratFollowup($raw->id, $raw->dueDate, $raw->assignedGroupId, $raw->subject, $raw->message, $raw->referencedPersonId, $raw->completed);
+}
+
+/**
+ * @param object $raw
+ * @return ProcuratRelationship
+ */
+function constructProcuratRelationship(object $raw): ProcuratRelationship
+{
+    return new ProcuratRelationship($raw->personId, $raw->relationshipType, $raw->custody, $raw->physical, $raw->realParent, $raw->notes);
 }
 
 /**
