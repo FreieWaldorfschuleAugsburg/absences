@@ -18,6 +18,7 @@ function sendUncompletedFollowUpReminder(): void
     $count = 0;
     foreach ($followUps as $followUp) {
         if (isAbsentToday($followUp->getReferencedPersonId())) {
+            deleteProcuratFollowUp($followUp->getId());
             continue;
         }
 
