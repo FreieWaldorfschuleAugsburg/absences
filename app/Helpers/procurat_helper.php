@@ -128,14 +128,25 @@ function countProcuratAbsences(): int
  */
 function isAbsentToday(int $personId): bool
 {
+    return !is_null(getAbsenceToday($personId));
+}
+
+/**
+ * @param int $personId
+ * @return ProcuratAbsence|null
+ */
+function getAbsenceToday(int $personId): ?ProcuratAbsence
+{
     $client = createAPIClient();
 
     try {
         $rawAbsences = decodeResponse($client->get('absences/person/' . $personId . '?type=today'));
-        return !empty($rawAbsences);
+        if (!empty($rawAbsences)) {
+            return constructProcuratAbsence($rawAbsences[0]);
+        }
     } catch (GuzzleException $e) {
     }
-    return false;
+    return null;
 }
 
 /**
