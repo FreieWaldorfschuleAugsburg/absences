@@ -140,7 +140,9 @@ function getAbsenceToday(int $personId): ?ProcuratAbsence
 
     try {
         $rawAbsences = decodeResponse($client->get('absences/person/' . $personId . '?type=today'));
-        return constructProcuratAbsence($rawAbsences);
+        if (!empty($rawAbsences)) {
+            return constructProcuratAbsence($rawAbsences[0]);
+        }
     } catch (GuzzleException $e) {
     }
     return null;
