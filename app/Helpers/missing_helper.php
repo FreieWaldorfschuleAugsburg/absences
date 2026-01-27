@@ -29,7 +29,7 @@ function sendUncompletedFollowUpReminder(): void
         return;
     }
 
-    $subject = sprintf("%s aussthende Meldung(en)", $count);
+    $subject = sprintf("%s ausstehende Meldung(en)", $count);
     sendGenericMail([getenv('absences.reminderEmail')], $subject, $subject,
         "Prüfe bitte die ausstehenden Meldungen in Procurat!5 unter 'Wiedervorlagen' und markiere sie ggf. als erledigt.");
 }
