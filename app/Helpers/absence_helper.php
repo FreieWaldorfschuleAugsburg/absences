@@ -17,7 +17,7 @@ function findReportablePersons(int $personId): array
     $persons = [];
     $ownPerson = getProcuratPerson($personId);
     // TODO find better criteria
-    if ($ownPerson->isAdult() && $ownPerson->getFamilyRole() == 'child') {
+    if ($ownPerson && $ownPerson->isAdult() && $ownPerson->getFamilyRole() == 'child') {
         $persons[] = $ownPerson;
     }
 

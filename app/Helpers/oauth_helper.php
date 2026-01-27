@@ -101,9 +101,16 @@ function createUserModel(string $username, string $displayName, ?int $procuratId
  */
 function createOIDC(): OpenIDConnectClient
 {
-    return new OpenIDConnectClient(
+    $oidc = new OpenIDConnectClient(
         getenv('oidc.endpoint'),
         getenv('oidc.clientId'),
         getenv('oidc.clientSecret')
     );
+
+    if (getenv('CI_ENVIRONMENT') == 'development') {
+        $oidc->setVerifyHost(false);
+        $oidc->setVerifyPeer(false);
+    }
+
+    return $oidc;
 }
