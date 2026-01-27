@@ -46,7 +46,7 @@ class AbsenceController extends BaseController
             return redirect('/')->with('error', lang('absences.error.invalidGroup'));
         }
 
-        renderPDF($group, 'print/PresentPrintView', [EntryStatus::Absent, EntryStatus::HalfDay]);
+        renderPDF($group, 'print/PresentPrintView', [EntryStatus::Absent]);
         exit;
     }
 }
