@@ -1,6 +1,6 @@
 <hr>
 <span style="font-size: 10px">Nur zum internen Gebrauch, sofern nicht entsprechende Datenschutzhinweise bzw. Einwilligungserklärungen
-    vorliegen.</span><span style="font-size: 12px"><br><br> &copy; <b>2025 Freie Waldorfschule und Waldorfkindergärten Augsburg e. V.</b><br>
+    vorliegen.</span><span style="font-size: 12px"><br><br> &copy; <b><?= date("Y") ?> Freie Waldorfschule und Waldorfkindergärten Augsburg e. V.</b><br>
 Entwickelt von Linus Groschke
 </span>
 
