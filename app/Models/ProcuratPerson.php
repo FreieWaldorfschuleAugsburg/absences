@@ -76,7 +76,6 @@ class ProcuratPerson
         }
 
         $age = DateTime::createFromFormat('Y-m-d\TH:i:sp', $this->birthDate)->diff(new DateTime('now'))->y;
-        log_message('error', 'is age: ' . $age);
         return $age >= 18;
     }
 }

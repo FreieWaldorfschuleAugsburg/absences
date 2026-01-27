@@ -17,7 +17,8 @@ class IndexController extends BaseController
         $user = user();
         $groups = $user->isStaff() ? getAbsenceGroups() : [];
         $reportablePersons = $user->getProcuratId() ? findReportablePersons($user->getProcuratId()) : [];
-        return view('IndexView', ['user' => user(), 'groups' => $groups, 'reportablePersons' => $reportablePersons]);
+        return view('IndexView', ['user' => user(), 'groups' => $groups,
+            'reportablePersons' => $reportablePersons, 'reasons' => getReportReasons(), 'timeslots' => getReportTimeslots()]);
     }
 
     /**

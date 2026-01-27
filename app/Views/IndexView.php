@@ -6,7 +6,7 @@
                     <i class="fas fa-school-flag"></i> Abwesenheit melden
                 </div>
                 <div class="card-body">
-                    <?= form_open() ?>
+                    <?= form_open('report') ?>
                     <label for="inputPerson" class="form-label">Kind</label>
                     <div class="input-group mb-3">
                         <select class="form-select" id="inputPerson" name="person" required>
@@ -18,25 +18,52 @@
                         </select>
                     </div>
 
-                    <label for="inputStartDatetime" class="form-label">Beginn der Abwesenheit</label>
+                    <label id="inputStart" class="form-label">Beginn der Abwesenheit</label>
                     <div class="input-group mb-3">
-                        <input class="form-control" type="datetime-local" id="inputStartDatetime" name="startDatetime" required>
+                        <input class="form-control" type="date" id="inputStartDate" name="startDate"
+                               value="<?= date("Y-m-d") ?>" aria-describedby="inputStart" required>
+                        <select class="form-select" id="inputStartTime" name="startTime" aria-describedby="inputStart"
+                                required>
+                            <option value="-1">Schulbeginn</option>
+                            <?php $i = 0 ?>
+                            <?php foreach ($timeslots as $timeslot) : ?>
+                                <option value="<?= $i++; ?>">
+                                    <?= $timeslot ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
 
-                    <label for="inputEndDatetime" class="form-label">Ende der Abwesenheit</label>
+                    <label for="inputEnd" class="form-label">Ende der Abwesenheit</label>
                     <div class="input-group mb-3">
-                        <input class="form-control" type="datetime-local" id="inputEndDatetime" name="endDatetime" required>
+                        <input class="form-control" type="date" id="inputEndDate" name="endDate"
+                               value="<?= date("Y-m-d") ?>" aria-describedby="inputEnd" required>
+                        <select class="form-select" id="inputEndTime" name="endTime" aria-describedby="inputEnd"
+                                required>
+                            <option value="-1">Schulschluss</option>
+                            <?php $i = 0 ?>
+                            <?php foreach ($timeslots as $timeslot) : ?>
+                                <option value="<?= $i++; ?>">
+                                    <?= $timeslot ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
 
                     <label for="inputReason" class="form-label">Grund</label>
                     <div class="input-group mb-3">
                         <select class="form-select" id="inputReason" name="reason" required>
-                            <option>Krankheit</option>
-                            <option>Termin</option>
+                            <?php foreach ($reasons as $reason) : ?>
+                                <option value="<?= $reason ?>">
+                                    <?= $reason ?>
+                                </option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
 
-                    <button id="submitButton" class="btn btn-primary btn-block" type="submit" disabled>Diese Funktion ist derzeit noch in Entwicklung!</button>
+                    <button id="submitButton" class="btn btn-primary btn-block" type="submit">
+                        Meldung absenden
+                    </button>
                     <?= form_close() ?>
                 </div>
             </div>

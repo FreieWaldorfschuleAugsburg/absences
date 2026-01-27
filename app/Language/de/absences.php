@@ -5,7 +5,8 @@ return [
         'info' => 'Informationen',
         'dateInfo' => 'Heute ist %s, der %s',
         'absentInfo' => 'Es sind insgesamt %s Abwesenheiten eingetragen',
-        'weekendInfo' => 'Am Wochenende können keine Abwesenheiten abgerufen werden.'
+        'weekendInfo' => 'Am Wochenende können keine Abwesenheiten abgerufen werden.',
+        'reportSuccessful' => 'Vielen Dank! Wir haben Ihre Abwesenheitsmeldung erfolgreich verarbeitet.',
     ],
     'group' => [
         'view' => 'Gesamt',

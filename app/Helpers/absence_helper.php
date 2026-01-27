@@ -1,12 +1,63 @@
 <?php
 
 use App\Models\AbsenceGroupModel;
+use App\Models\EndBeforeStartDateException;
 use App\Models\EntryStatus;
+use App\Models\InvalidPersonException;
+use App\Models\MaxDiffException;
 use App\Models\ProcuratAbsence;
 use App\Models\ProcuratFollowup;
 use App\Models\ProcuratPerson;
 use Mpdf\MpdfException;
 use function App\Helpers\user;
+
+/**
+ * @throws InvalidPersonException
+ * @throws EndBeforeStartDateException
+ * @throws MaxDiffException
+ * @throws Exception
+ */
+function reportAbsent(int $personId, string $startDateString, string $startIndex, string $endDateString, string $endIndex, string $reason): void
+{
+    $person = getProcuratPerson($personId);
+    if (!$person) {
+        throw new InvalidPersonException();
+    }
+
+    // TODO verify relationship
+
+    $startDate = DateTimeImmutable::createFromFormat('Y-m-d', $startDateString);
+    $endDate = DateTimeImmutable::createFromFormat('Y-m-d', $endDateString);
+
+    $dateDiff = $endDate->diff($startDate)->days;
+    if ($dateDiff < 0) {
+        throw new EndBeforeStartDateException();
+    }
+
+    if ($dateDiff > getReasonMaxDiff($reason)) {
+        throw new MaxDiffException();
+    }
+
+    // TODO check min and max minutes for reason
+    // TODO add cutoff time (e.g. 9am)
+
+    for ($i = 0; $i < $dateDiff + 1; $i++) {
+        $currentDate = $startDate->add(new DateInterval('P' . $i . 'D'));
+        $currentReason = $reason;
+
+        // If first absence in sequence
+        if ($i == 0 && $startIndex != '-1') {
+            $currentReason .= ' ab ' . getReportTimeslots()[intval($startIndex)];
+        }
+
+        // If last absence in sequence
+        if ($i == $dateDiff && $endIndex != '-1') {
+            $currentReason .= ' bis ' . getReportTimeslots()[intval($endIndex)];
+        }
+
+        log_message('info', 'Would create absence for ' . $currentDate->format('Y-m-d') . ' with reason ' . $currentReason);
+    }
+}
 
 /**
  * @param int $personId
@@ -123,4 +174,25 @@ function findFollowUpByPersonId(array $followUps, int $personId): ?ProcuratFollo
     }
 
     return null;
+}
+
+/**
+ * @return string[]
+ */
+function getReportReasons(): array
+{
+    return explode(',', getenv('absences.report.reasons'));
+}
+
+/**
+ * @return string[]
+ */
+function getReportTimeslots(): array
+{
+    return explode(',', getenv('absences.report.timeslots'));
+}
+
+function getReasonMaxDiff(string $reason): int
+{
+    return intval(getenv('absences.report.maxDiff.' . $reason));
 }
