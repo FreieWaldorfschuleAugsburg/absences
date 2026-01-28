@@ -159,6 +159,26 @@ function getAbsenceToday(int $personId): ?ProcuratAbsence
     return null;
 }
 
+function createProcuratAbsence(int $personId, DateTimeInterface $date, string $reason): void
+{
+    $formattedDate = $date->format('Y-m-d\TH:i:sp');
+    $client = createAPIClient();
+    try {
+        $client->post('absences', [
+            'json' => [
+                'personId' => $personId,
+                'startDate' => $formattedDate,
+                'endDate' => $formattedDate,
+                'excused' => true,
+                'parentsInformed' => true,
+                'note' => $reason
+            ]
+        ]);
+    } catch (GuzzleException $e) {
+        log_message('error', "Error creating follow-up {exception}", ['exception' => $e]);
+    }
+}
+
 /**
  * @return ProcuratFollowup[]
  */

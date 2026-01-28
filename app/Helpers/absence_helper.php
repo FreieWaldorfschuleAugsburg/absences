@@ -55,7 +55,7 @@ function reportAbsent(int $personId, string $startDateString, string $startIndex
             $currentReason .= ' bis ' . getReportTimeslots()[intval($endIndex)];
         }
 
-        log_message('info', 'Would create absence for ' . $currentDate->format('Y-m-d') . ' with reason ' . $currentReason);
+        createProcuratAbsence($personId, $currentDate, $currentReason);
     }
 }
 
