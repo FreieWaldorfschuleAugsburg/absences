@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Exception;
 
-class MaxDiffException extends Exception
+class EndBeforeStartTimeException extends Exception
 {
     function __construct($message = '', $previous = null)
     {

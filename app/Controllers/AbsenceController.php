@@ -2,15 +2,16 @@
 
 namespace App\Controllers;
 
+use App\Models\AlreadyAbsentException;
 use App\Models\EndBeforeStartDateException;
+use App\Models\EndBeforeStartTimeException;
 use App\Models\EntryStatus;
 use App\Models\InvalidPersonException;
-use App\Models\MaxDiffException;
+use App\Models\MaxDaysExceededException;
 use App\Models\OAuthException;
+use App\Models\MinDateUndercutException;
 use CodeIgniter\HTTP\RedirectResponse;
-use Exception;
 use Mpdf\MpdfException;
-use function App\Helpers\user;
 
 class AbsenceController extends BaseController
 {
@@ -65,14 +66,18 @@ class AbsenceController extends BaseController
 
         try {
             reportAbsent($personId, $startDate, $startTime, $endDate, $endTime, $reason);
-        } catch (InvalidPersonException) {
-            return redirect('/')->with('error', lang('absences.index.invalidPerson'));
+        } catch (MinDateUndercutException) {
+            return redirect('/')->with('error', lang('absences.index.minDateUndercut'));
         } catch (EndBeforeStartDateException) {
             return redirect('/')->with('error', lang('absences.index.endBeforeStartDate'));
-        } catch (MaxDiffException) {
-            return redirect('/')->with('error', lang('absences.index.maxDiff'));
-        } catch (Exception) {
-            return redirect('/')->with('error', lang('absences.index.unknownError'));
+        } catch (EndBeforeStartTimeException) {
+            return redirect('/')->with('error', lang('absences.index.endBeforeStartTime'));
+        } catch (MaxDaysExceededException) {
+            return redirect('/')->with('error', lang('absences.index.maxDaysExceeded'));
+        } catch (InvalidPersonException) {
+            return redirect('/')->with('error', lang('absences.index.invalidPerson'));
+        } catch (AlreadyAbsentException $e) {
+            return redirect('/')->with('error', lang('absences.index.alreadyAbsent'));
         }
 
         return redirect('/')->with('success', lang('absences.index.reportSuccessful'));

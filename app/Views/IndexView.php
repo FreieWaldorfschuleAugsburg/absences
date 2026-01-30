@@ -6,65 +6,83 @@
                     <i class="fas fa-school-flag"></i> Abwesenheit melden
                 </div>
                 <div class="card-body">
-                    <?= form_open('report') ?>
-                    <label for="inputPerson" class="form-label">Kind</label>
-                    <div class="input-group mb-3">
-                        <select class="form-select" id="inputPerson" name="person" required>
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <?php $active = false; ?>
                             <?php foreach ($reportablePersons as $person) : ?>
-                                <option value="<?= $person->getId() ?>">
-                                    <?= $person->getFullName() ?>
-                                </option>
+                                <button class="nav-link <?= !$active ? 'active' : '' ?>"
+                                        id="tab-<?= $person->getId() ?>"
+                                        data-bs-toggle="tab"
+                                        data-bs-target="#form-<?= $person->getId() ?>" type="button" role="tab"
+                                        aria-controls="form-<?= $person->getId() ?>"
+                                        aria-selected="true"><?= $person->getFullName() ?></button>
+                                <?php $active = true; ?>
                             <?php endforeach; ?>
-                        </select>
-                    </div>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <?php $active = false; ?>
+                        <?php foreach ($reportablePersons as $person) : ?>
+                            <div class="tab-pane fade <?= !$active ? 'show active' : '' ?>" id="form-<?= $person->getId() ?>" role="tabpanel"
+                                 aria-labelledby="tab-<?= $person->getId() ?>">
+                                <?= form_open('report') ?>
+                                <?= form_hidden('person', strval($person->getId())) ?>
 
-                    <label id="inputStart" class="form-label">Beginn der Abwesenheit</label>
-                    <div class="input-group mb-3">
-                        <input class="form-control" type="date" id="inputStartDate" name="startDate"
-                               value="<?= date("Y-m-d") ?>" aria-describedby="inputStart" required>
-                        <select class="form-select" id="inputStartTime" name="startTime" aria-describedby="inputStart"
-                                required>
-                            <option value="-1">Schulbeginn</option>
-                            <?php $i = 0 ?>
-                            <?php foreach ($timeslots as $timeslot) : ?>
-                                <option value="<?= $i++; ?>">
-                                    <?= $timeslot ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                                <label id="inputStart" class="form-label mt-3">Beginn der Abwesenheit</label>
+                                <div class="input-group mb-3">
+                                    <input class="form-control" type="date" id="inputStartDate" name="startDate"
+                                           value="<?= $minDate = getMinAbsenceDateFormatted() ?>" min="<?= $minDate ?>"
+                                           aria-describedby="inputStart" required>
+                                    <select class="form-select" id="inputStartTime" name="startTime"
+                                            aria-describedby="inputStart"
+                                            required>
+                                        <option value="-1">Schulbeginn</option>
+                                        <?php $i = 0 ?>
+                                        <?php foreach ($timeslots as $timeslot) : ?>
+                                            <option value="<?= $i++; ?>">
+                                                <?= $timeslot ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
 
-                    <label for="inputEnd" class="form-label">Ende der Abwesenheit</label>
-                    <div class="input-group mb-3">
-                        <input class="form-control" type="date" id="inputEndDate" name="endDate"
-                               value="<?= date("Y-m-d") ?>" aria-describedby="inputEnd" required>
-                        <select class="form-select" id="inputEndTime" name="endTime" aria-describedby="inputEnd"
-                                required>
-                            <option value="-1">Schulschluss</option>
-                            <?php $i = 0 ?>
-                            <?php foreach ($timeslots as $timeslot) : ?>
-                                <option value="<?= $i++; ?>">
-                                    <?= $timeslot ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                                <label for="inputEnd" class="form-label">Ende der Abwesenheit</label>
+                                <div class="input-group mb-3">
+                                    <input class="form-control" type="date" id="inputEndDate" name="endDate"
+                                           value="<?= $minDate ?>" min="<?= $minDate ?>" aria-describedby="inputEnd"
+                                           required>
+                                    <select class="form-select" id="inputEndTime" name="endTime"
+                                            aria-describedby="inputEnd"
+                                            required>
+                                        <option value="-1">Schulschluss</option>
+                                        <?php $i = 0 ?>
+                                        <?php foreach ($timeslots as $timeslot) : ?>
+                                            <option value="<?= $i++; ?>">
+                                                <?= $timeslot ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
 
-                    <label for="inputReason" class="form-label">Grund</label>
-                    <div class="input-group mb-3">
-                        <select class="form-select" id="inputReason" name="reason" required>
-                            <?php foreach ($reasons as $reason) : ?>
-                                <option value="<?= $reason ?>">
-                                    <?= $reason ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
+                                <label for="inputReason" class="form-label">Grund</label>
+                                <div class="input-group mb-3">
+                                    <select class="form-select" id="inputReason" name="reason" required>
+                                        <?php foreach ($reasons as $reason) : ?>
+                                            <option value="<?= $reason ?>">
+                                                <?= $reason ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
 
-                    <button id="submitButton" class="btn btn-primary btn-block" type="submit">
-                        Meldung absenden
-                    </button>
-                    <?= form_close() ?>
+                                <button id="submitButton" class="btn btn-primary btn-block" type="submit">
+                                    Meldung absenden
+                                </button>
+                                <?= form_close() ?>
+                            </div>
+                            <?php $active = true; ?>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
         </div>

@@ -118,19 +118,6 @@ function getProcuratAbsences(): array
     return $absences;
 }
 
-function countProcuratAbsences(): int
-{
-    $client = createAPIClient();
-
-    try {
-        $rawAbsences = decodeResponse($client->get('absences?type=today'));
-        return count($rawAbsences);
-    } catch (GuzzleException $e) {
-        log_message('error', "Error counting absences {exception}", ['exception' => $e]);
-    }
-    return -1;
-}
-
 /**
  * @param int $personId
  * @return bool
@@ -159,6 +146,42 @@ function getAbsenceToday(int $personId): ?ProcuratAbsence
     return null;
 }
 
+/**
+ * @param int $personId
+ * @return ProcuratAbsence[]
+ */
+function getAbsencesByPersonId(int $personId): array
+{
+    $absences = [];
+    $client = createAPIClient();
+
+    try {
+        $rawAbsences = decodeResponse($client->get('absences/person/' . $personId));
+        foreach ($rawAbsences as $rawAbsence) {
+            $absences[] = constructProcuratAbsence($rawAbsence);
+        }
+    } catch (GuzzleException $e) {
+        log_message('error', "Error absences for person {$personId} {exception}", ['exception' => $e]);
+    }
+    return $absences;
+}
+
+/**
+ * @param ProcuratAbsence[] $absences
+ * @param int $personId
+ * @param DateTimeInterface $date
+ * @return ProcuratAbsence|null
+ */
+function findAbsence(array $absences, DateTimeInterface $date): ?ProcuratAbsence
+{
+    foreach ($absences as $absence) {
+        if ($absence->getDate()->format('Y-m-d') == $date->format('Y-m-d')) {
+            return $absence;
+        }
+    }
+    return null;
+}
+
 function createProcuratAbsence(int $personId, DateTimeInterface $date, string $reason): void
 {
     $formattedDate = $date->format('Y-m-d\TH:i:sp');
@@ -175,7 +198,17 @@ function createProcuratAbsence(int $personId, DateTimeInterface $date, string $r
             ]
         ]);
     } catch (GuzzleException $e) {
-        log_message('error', "Error creating follow-up {exception}", ['exception' => $e]);
+        log_message('error', "Error creating absence {exception}", ['exception' => $e]);
+    }
+}
+
+function deleteProcuratAbsence(int $absenceId): void
+{
+    $client = createAPIClient();
+    try {
+        $client->delete('absences/' . $absenceId);
+    } catch (GuzzleException $e) {
+        log_message('error', "Error deleting absence {exception}", ['exception' => $e]);
     }
 }
 
@@ -283,7 +316,7 @@ function constructProcuratGroupMembership(object $raw): ProcuratGroupMembership
  */
 function constructProcuratAbsence(object $raw): ProcuratAbsence
 {
-    return new ProcuratAbsence($raw->id, $raw->personId, $raw->excused, $raw->note);
+    return new ProcuratAbsence($raw->id, $raw->personId, $raw->date, $raw->excused, $raw->note);
 }
 
 /**
