@@ -2,10 +2,12 @@
 
 return [
     'index' => [
-        'info' => 'Informationen',
-        'dateInfo' => 'Heute ist %s, der %s',
-        'absentInfo' => 'Es sind insgesamt %s Abwesenheiten eingetragen',
-        'weekendInfo' => 'Am Wochenende können keine Abwesenheiten abgerufen werden.',
+        'minDateUndercut' => 'Abwesenheitsmeldungen müssen bis %s Uhr am ersten Tag der Abwesenheit erfolgt sein.',
+        'endBeforeStartDate' => 'Das Enddatum kann nicht vor dem Startdatum liegen.',
+        'endBeforeStartTime' => 'Die Endzeit kann nicht vor der Startzeit liegen.',
+        'maxDaysExceeded' => 'Eine Abwesenheitsmeldung darf sich maximal über %s Tage erstrecken.',
+        'invalidPerson' => 'Ungültige Person',
+        'alreadyAbsent' => 'Im gewählten Zeitraum liegt bereits min. eine Abwesenheitsmeldung vor. Bitte ändern Sie den Zeitraum!',
         'reportSuccessful' => 'Vielen Dank! Wir haben Ihre Abwesenheitsmeldung erfolgreich verarbeitet.',
     ],
     'group' => [
@@ -23,6 +25,6 @@ return [
         'invalidPerson' => 'Ungültige Person',
         'invalidGroup' => 'Ungültige Abwesenheitsgruppe',
         'alreadyAbsent' => 'Person ist bereits als abwesend eingetragen',
-        'noFollowUp' => 'Person nicht abwesend gemeldet'
+        'noFollowUp' => 'Person nicht mehr als fehlend gemeldet'
     ]
 ];

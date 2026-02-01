@@ -1,4 +1,7 @@
-<?php if (!empty($reportablePersons)) : ?>
+<?php use function App\Helpers\isTestUser;
+use function App\Helpers\user;
+
+if (!empty($reportablePersons) && isTestUser(user())) : ?>
     <div class="row">
         <div class="col-lg-12">
             <div class="card mb-3">

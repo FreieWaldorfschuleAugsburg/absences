@@ -76,7 +76,7 @@ class AbsenceController extends BaseController
             return redirect('/')->with('error', lang('absences.index.maxDaysExceeded'));
         } catch (InvalidPersonException) {
             return redirect('/')->with('error', lang('absences.index.invalidPerson'));
-        } catch (AlreadyAbsentException $e) {
+        } catch (AlreadyAbsentException) {
             return redirect('/')->with('error', lang('absences.index.alreadyAbsent'));
         }
 

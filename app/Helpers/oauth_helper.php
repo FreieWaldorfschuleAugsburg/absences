@@ -114,3 +114,8 @@ function createOIDC(): OpenIDConnectClient
 
     return $oidc;
 }
+
+function isTestUser(UserModel $userModel): bool
+{
+    return in_array(getenv('oidc.testGroup'), $userModel->getGroups());
+}
