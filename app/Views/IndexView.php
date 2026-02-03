@@ -18,7 +18,9 @@ if (!empty($reportablePersons) && isTestUser(user())) : ?>
                                         data-bs-toggle="tab"
                                         data-bs-target="#form-<?= $person->getId() ?>" type="button" role="tab"
                                         aria-controls="form-<?= $person->getId() ?>"
-                                        aria-selected="true"><?= $person->getFullName() ?></button>
+                                        aria-selected="true">
+                                    <?= $person->getFullName() ?>
+                                </button>
                                 <?php $active = true; ?>
                             <?php endforeach; ?>
                         </div>
@@ -29,6 +31,13 @@ if (!empty($reportablePersons) && isTestUser(user())) : ?>
                             <div class="tab-pane fade <?= !$active ? 'show active' : '' ?>"
                                  id="form-<?= $person->getId() ?>" role="tabpanel"
                                  aria-labelledby="tab-<?= $person->getId() ?>">
+
+                                <div class="text-end">
+                                    <a href="" class="btn btn-primary btn-sm mt-3">
+                                        <i class="fas fa-list"></i> Abwesenheiten für <?= $person->getFirstName() ?> anzeigen
+                                    </a>
+                                </div>
+
                                 <?= form_open('report') ?>
                                 <?= form_hidden('person', strval($person->getId())) ?>
 
