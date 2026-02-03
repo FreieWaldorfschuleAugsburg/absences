@@ -26,15 +26,28 @@ if (!empty($reportablePersons) && isTestUser(user())) : ?>
                     <div class="tab-content" id="nav-tabContent">
                         <?php $active = false; ?>
                         <?php foreach ($reportablePersons as $person) : ?>
-                            <div class="tab-pane fade <?= !$active ? 'show active' : '' ?>" id="form-<?= $person->getId() ?>" role="tabpanel"
+                            <div class="tab-pane fade <?= !$active ? 'show active' : '' ?>"
+                                 id="form-<?= $person->getId() ?>" role="tabpanel"
                                  aria-labelledby="tab-<?= $person->getId() ?>">
                                 <?= form_open('report') ?>
                                 <?= form_hidden('person', strval($person->getId())) ?>
 
-                                <label id="inputStart" class="form-label mt-3">Beginn der Abwesenheit</label>
+                                <label for="inputReason" class="form-label mt-3">Grund</label>
+                                <div class="input-group mb-3">
+                                    <select class="form-select" id="inputReason" name="reason" required>
+                                        <?php foreach ($reasons as $reason) : ?>
+                                            <option value="<?= $reason ?>">
+                                                <?= $reason ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <label id="inputStart" class="form-label">Beginn der Abwesenheit</label>
                                 <div class="input-group mb-3">
                                     <input class="form-control" type="date" id="inputStartDate" name="startDate"
                                            value="<?= $minDate = getMinAbsenceDateFormatted() ?>" min="<?= $minDate ?>"
+                                           onchange="adjustDate(this, document.getElementById('inputEndDate'), false)"
                                            aria-describedby="inputStart" required>
                                     <select class="form-select" id="inputStartTime" name="startTime"
                                             aria-describedby="inputStart"
@@ -53,6 +66,7 @@ if (!empty($reportablePersons) && isTestUser(user())) : ?>
                                 <div class="input-group mb-3">
                                     <input class="form-control" type="date" id="inputEndDate" name="endDate"
                                            value="<?= $minDate ?>" min="<?= $minDate ?>" aria-describedby="inputEnd"
+                                           onchange="adjustDate(this, document.getElementById('inputStartDate'), true)"
                                            required>
                                     <select class="form-select" id="inputEndTime" name="endTime"
                                             aria-describedby="inputEnd"
@@ -62,17 +76,6 @@ if (!empty($reportablePersons) && isTestUser(user())) : ?>
                                         <?php foreach ($timeslots as $timeslot) : ?>
                                             <option value="<?= $i++; ?>">
                                                 <?= $timeslot ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </div>
-
-                                <label for="inputReason" class="form-label">Grund</label>
-                                <div class="input-group mb-3">
-                                    <select class="form-select" id="inputReason" name="reason" required>
-                                        <?php foreach ($reasons as $reason) : ?>
-                                            <option value="<?= $reason ?>">
-                                                <?= $reason ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -90,6 +93,17 @@ if (!empty($reportablePersons) && isTestUser(user())) : ?>
             </div>
         </div>
     </div>
+
+    <script>
+        function adjustDate(originObject, targetObject, reverseComparison) {
+            const originDate = Date.parse(originObject.value);
+            const targetDate = Date.parse(targetObject.value);
+
+            if ((!reverseComparison && originDate > targetDate) || (reverseComparison && originDate < targetDate)) {
+                targetObject.value = originObject.value;
+            }
+        }
+    </script>
 <?php endif; ?>
 
 <?php if (!empty($groups)) : ?>
