@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-use DateTime;
+use DateTimeImmutable;
+use DateTimeInterface;
+use DateTimeZone;
 
 class ProcuratFollowup
 {
@@ -34,19 +36,19 @@ class ProcuratFollowup
     }
 
     /**
-     * @return array
+     * @return DateTimeInterface
      */
-    public function getDueDate(): array
+    public function getDueDate(): DateTimeInterface
     {
-        return date_parse_from_format('Y-m-d\TH:i:s+', $this->dueDate);
+        return DateTimeImmutable::createFromFormat('Y-m-d\TH:i:sp', $this->dueDate)->setTimezone(new DateTimeZone('Europe/Berlin'));
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getAssignedPersonId(): int
+    public function getAssignedGroupId(): ?int
     {
-        return $this->assignedPersonId;
+        return $this->assignedGroupId;
     }
 
     /**

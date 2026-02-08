@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="<?= base_url('/') ?>assets/css/fontawesome.min.css?build=1768163594032"/>
 
     <link href="<?= base_url('/') ?>assets/css/style.css?build=1768163594032" rel="stylesheet">
+    <script src="<?= base_url('/') ?>assets/js/fullcalendar.min.js"></script>
 
     <!-- Matomo -->
     <script>

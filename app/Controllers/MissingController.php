@@ -16,10 +16,8 @@ class MissingController extends BaseController
      */
     public function reportMissing(int $personId): string|RedirectResponse
     {
-        $user = user();
-
         try {
-            reportMissing($personId, $user->getDisplayName());
+            reportMissing($personId, user()->getDisplayName());
             return redirect()->back();
         } catch (AlreadyAbsentException) {
             return redirect()->back()->with('error', lang('absences.error.alreadyAbsent'));

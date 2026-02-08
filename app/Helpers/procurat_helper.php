@@ -4,6 +4,7 @@ use App\Models\ProcuratAbsence;
 use App\Models\ProcuratFollowup;
 use App\Models\ProcuratGroupMembership;
 use App\Models\ProcuratPerson;
+use App\Models\ProcuratRelationship;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
@@ -22,6 +23,9 @@ function createAPIClient(): Client
         'headers' => [
             'X-API-KEY' => getenv('procurat.apiKey'),
             'Accept' => 'application/json'
+        ],
+        'curl' => [
+            CURLOPT_SSL_OPTIONS => CURLSSLOPT_NATIVE_CA,
         ]
     ]);
 }
@@ -39,7 +43,8 @@ function getGroupMembershipsByGroupId(int $groupId): array
         foreach ($rawMemberships as $rawMembership) {
             $memberships[] = constructProcuratGroupMembership($rawMembership);
         }
-    } catch (GuzzleException) {
+    } catch (GuzzleException $e) {
+        log_message('error', "Error getting group memberships for group {$groupId} {exception}", ['exception' => $e]);
     }
     return $memberships;
 }
@@ -53,8 +58,9 @@ function getProcuratPerson(int $id): ?ProcuratPerson
     $client = createAPIClient();
     try {
         $response = decodeResponse($client->get('persons/' . $id));
-        return new ProcuratPerson($response->id, $response->firstName, $response->lastName);
-    } catch (GuzzleException) {
+        return constructProcuratPerson($response);
+    } catch (GuzzleException $e) {
+        log_message('error', "Error getting person {$id} {exception}", ['exception' => $e]);
         return null;
     }
 }
@@ -69,9 +75,11 @@ function getAllProcuratPersons(): array
     try {
         $rawPersons = decodeResponse($client->get('persons'));
         foreach ($rawPersons as $rawPerson) {
-            $persons[] = new ProcuratPerson($rawPerson->id, $rawPerson->firstName, $rawPerson->lastName);
+            $persons[] = constructProcuratPerson($rawPerson);
         }
-    } catch (GuzzleException) {
+    } catch (GuzzleException $e) {
+        log_message('error', "Error getting all persons {exception}", ['exception' => $e]);
+
     }
     return $persons;
 }
@@ -105,20 +113,9 @@ function getProcuratAbsences(): array
             $absences[] = constructProcuratAbsence($rawAbsence);
         }
     } catch (GuzzleException $e) {
+        log_message('error', "Error getting absences {exception}", ['exception' => $e]);
     }
     return $absences;
-}
-
-function countProcuratAbsences(): int
-{
-    $client = createAPIClient();
-
-    try {
-        $rawAbsences = decodeResponse($client->get('absences?type=today'));
-        return count($rawAbsences);
-    } catch (GuzzleException $e) {
-    }
-    return -1;
 }
 
 /**
@@ -144,8 +141,94 @@ function getAbsenceToday(int $personId): ?ProcuratAbsence
             return constructProcuratAbsence($rawAbsences[0]);
         }
     } catch (GuzzleException $e) {
+        log_message('error', "Error getting today's absence for person {$personId} {exception}", ['exception' => $e]);
     }
     return null;
+}
+
+/**
+ * @param int $personId
+ * @return ProcuratAbsence[]
+ */
+function getSchoolYearAbsencesByPersonId(int $personId): array
+{
+    $absences = [];
+    $client = createAPIClient();
+
+    try {
+        $rawAbsences = decodeResponse($client->get('absences/person/' . $personId . '?type=schoolyear'));
+        foreach ($rawAbsences as $rawAbsence) {
+            $absences[] = constructProcuratAbsence($rawAbsence);
+        }
+    } catch (GuzzleException $e) {
+        log_message('error', "Error absences for person {$personId} {exception}", ['exception' => $e]);
+    }
+    return $absences;
+}
+
+/**
+ * @param int $personId
+ * @return ProcuratAbsence[]
+ */
+function getAbsencesByPersonId(int $personId): array
+{
+    $absences = [];
+    $client = createAPIClient();
+
+    try {
+        $rawAbsences = decodeResponse($client->get('absences/person/' . $personId));
+        foreach ($rawAbsences as $rawAbsence) {
+            $absences[] = constructProcuratAbsence($rawAbsence);
+        }
+    } catch (GuzzleException $e) {
+        log_message('error', "Error absences for person {$personId} {exception}", ['exception' => $e]);
+    }
+    return $absences;
+}
+
+/**
+ * @param ProcuratAbsence[] $absences
+ * @param DateTimeInterface $date
+ * @return ProcuratAbsence|null
+ */
+function findAbsence(array $absences, DateTimeInterface $date): ?ProcuratAbsence
+{
+    foreach ($absences as $absence) {
+        if ($absence->getDate()->format('Y-m-d') == $date->format('Y-m-d')) {
+            return $absence;
+        }
+    }
+    return null;
+}
+
+function createProcuratAbsence(int $personId, DateTimeInterface $date, string $reason): void
+{
+    $formattedDate = $date->format('Y-m-d\TH:i:sp');
+    $client = createAPIClient();
+    try {
+        $client->post('absences', [
+            'json' => [
+                'personId' => $personId,
+                'startDate' => $formattedDate,
+                'endDate' => $formattedDate,
+                'excused' => true,
+                'parentsInformed' => true,
+                'note' => $reason
+            ]
+        ]);
+    } catch (GuzzleException $e) {
+        log_message('error', "Error creating absence {exception}", ['exception' => $e]);
+    }
+}
+
+function deleteProcuratAbsence(int $absenceId): void
+{
+    $client = createAPIClient();
+    try {
+        $client->delete('absences/' . $absenceId);
+    } catch (GuzzleException $e) {
+        log_message('error', "Error deleting absence {exception}", ['exception' => $e]);
+    }
 }
 
 /**
@@ -162,6 +245,7 @@ function getProcuratFollowUps(): array
             $followUps[] = constructProcuratFollowUp($rawFollowUp);
         }
     } catch (GuzzleException $e) {
+        log_message('error', "Error getting follow-ups {exception}", ['exception' => $e]);
     }
 
     // Sort descending by id
@@ -193,7 +277,8 @@ function createProcuratFollowUp(int $assignedGroupId, int $referencedPersonId, s
                 'message' => $message
             ]
         ]);
-    } catch (GuzzleException) {
+    } catch (GuzzleException $e) {
+        log_message('error', "Error creating follow-up {exception}", ['exception' => $e]);
     }
 }
 
@@ -202,8 +287,58 @@ function deleteProcuratFollowUp(int $followUpId): void
     $client = createAPIClient();
     try {
         $client->delete('followups/' . $followUpId);
-    } catch (GuzzleException) {
+    } catch (GuzzleException $e) {
+        log_message('error', "Error deleting follow-up {exception}", ['exception' => $e]);
     }
+}
+
+/**
+ * @param int $personId
+ * @return ProcuratRelationship[]
+ */
+function getProcuratRelationships(int $personId): array
+{
+    $client = createAPIClient();
+    $relationships = [];
+    try {
+        $rawRelationships = decodeResponse($client->get('relationships/person/' . $personId));
+        foreach ($rawRelationships as $raw) {
+            $relationships[] = constructProcuratRelationship($raw);
+        }
+    } catch (GuzzleException $e) {
+        log_message('error', "Error getting relationships for person {$personId} {exception}", ['exception' => $e]);
+    }
+    return $relationships;
+}
+
+/**
+ * @param int $childPersonId
+ * @param int $parentPersonId
+ * @return bool
+ */
+function isProcuratChildCustodyRelationship(int $parentPersonId, int $childPersonId): bool
+{
+    if ($parentPersonId == $childPersonId) {
+        return true;
+    }
+
+    $relationships = getProcuratRelationships($parentPersonId);
+    foreach ($relationships as $relationship) {
+        if ($relationship->getPersonId() == $childPersonId && $relationship->isCustody() && ($relationship->getRelationshipType() == "son" || $relationship->getRelationshipType() == "daughter")) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @param object $raw
+ * @return ProcuratPerson
+ */
+function constructProcuratPerson(object $raw): ProcuratPerson
+{
+    return new ProcuratPerson($raw->id, $raw->firstName, $raw->lastName, $raw->birthDate, $raw->familyRole);
 }
 
 /**
@@ -221,7 +356,7 @@ function constructProcuratGroupMembership(object $raw): ProcuratGroupMembership
  */
 function constructProcuratAbsence(object $raw): ProcuratAbsence
 {
-    return new ProcuratAbsence($raw->id, $raw->personId, $raw->excused, $raw->note);
+    return new ProcuratAbsence($raw->id, $raw->personId, $raw->date, $raw->excused, $raw->note);
 }
 
 /**
@@ -231,6 +366,15 @@ function constructProcuratAbsence(object $raw): ProcuratAbsence
 function constructProcuratFollowUp(object $raw): ProcuratFollowup
 {
     return new ProcuratFollowup($raw->id, $raw->dueDate, $raw->assignedGroupId, $raw->subject, $raw->message, $raw->referencedPersonId, $raw->completed);
+}
+
+/**
+ * @param object $raw
+ * @return ProcuratRelationship
+ */
+function constructProcuratRelationship(object $raw): ProcuratRelationship
+{
+    return new ProcuratRelationship($raw->personId, $raw->relationshipType, $raw->custody, $raw->physical, $raw->realParent, $raw->notes);
 }
 
 /**

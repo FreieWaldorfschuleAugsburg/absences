@@ -2,17 +2,23 @@
 
 namespace App\Models;
 
+use DateTime;
+
 class ProcuratPerson
 {
     private int $id;
     private ?string $firstName;
     private ?string $lastName;
+    private ?string $birthDate;
+    private ?string $familyRole;
 
-    function __construct($id, $firstName, $lastName)
+    function __construct($id, $firstName, $lastName, $birthDate, $familyRole)
     {
         $this->id = $id;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
+        $this->birthDate = $birthDate;
+        $this->familyRole = $familyRole;
     }
 
     /**
@@ -40,10 +46,36 @@ class ProcuratPerson
     }
 
     /**
+     * @return string|null
+     */
+    public function getBirthDate(): ?string
+    {
+        return $this->birthDate;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFamilyRole(): ?string
+    {
+        return $this->familyRole;
+    }
+
+    /**
      * @return string
      */
     public function getFullName(): string
     {
         return $this->firstName . ' ' . $this->lastName;
+    }
+
+    public function isAdult(): ?bool
+    {
+        if (!$this->birthDate) {
+            return null;
+        }
+
+        $age = DateTime::createFromFormat('Y-m-d\TH:i:sp', $this->birthDate)->diff(new DateTime('now'))->y;
+        return $age >= 18;
     }
 }

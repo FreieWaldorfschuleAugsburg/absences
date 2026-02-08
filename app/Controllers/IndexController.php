@@ -14,7 +14,11 @@ class IndexController extends BaseController
      */
     public function index(): string
     {
-        return view('IndexView', ['user' => user(), 'groups' => getAbsenceGroups()]);
+        $user = user();
+        $groups = $user->isStaff() ? getAbsenceGroups() : [];
+        $reportablePersons = $user->getProcuratId() ? findReportablePersons($user->getProcuratId()) : [];
+        return view('IndexView', ['user' => user(), 'groups' => $groups,
+            'reportablePersons' => $reportablePersons, 'reasons' => getReportReasons(), 'timeslots' => getReportTimeslots()]);
     }
 
     /**

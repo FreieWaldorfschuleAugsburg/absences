@@ -30,10 +30,14 @@ function login(): RedirectResponse
 
         $username = $oidc->requestUserInfo('preferred_username');
         $name = $oidc->requestUserInfo('name');
+        $procuratId = $oidc->requestUserInfo('procurat_id');
+        if ($procuratId) {
+            $procuratId = intval($procuratId);
+        }
         $claims = $oidc->getVerifiedClaims();
         $groups = property_exists($claims, 'groups') ? $oidc->getVerifiedClaims()->groups : [];
 
-        $userModel = createUserModel($username, $name, $oidc->getIdToken(), $oidc->getRefreshToken(), $groups);
+        $userModel = createUserModel($username, $name, $procuratId, $oidc->getIdToken(), $oidc->getRefreshToken(), $groups);
         session()->set('USER', $userModel);
 
         return redirect('/');
@@ -87,9 +91,9 @@ function user(): ?UserModel
     }
 }
 
-function createUserModel(string $username, string $displayName, string $idToken, string $refreshToken, array $groups): UserModel
+function createUserModel(string $username, string $displayName, ?int $procuratId, string $idToken, string $refreshToken, array $groups): UserModel
 {
-    return new UserModel($username, $displayName, $idToken, $refreshToken, $groups);
+    return new UserModel($username, $displayName, $procuratId, $idToken, $refreshToken, $groups);
 }
 
 /**
@@ -97,9 +101,16 @@ function createUserModel(string $username, string $displayName, string $idToken,
  */
 function createOIDC(): OpenIDConnectClient
 {
-    return new OpenIDConnectClient(
+    $oidc = new OpenIDConnectClient(
         getenv('oidc.endpoint'),
         getenv('oidc.clientId'),
         getenv('oidc.clientSecret')
     );
+
+    if (getenv('CI_ENVIRONMENT') == 'development') {
+        $oidc->setVerifyHost(false);
+        $oidc->setVerifyPeer(false);
+    }
+
+    return $oidc;
 }

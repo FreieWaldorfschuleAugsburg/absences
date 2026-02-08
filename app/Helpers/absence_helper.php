@@ -1,11 +1,114 @@
 <?php
 
 use App\Models\AbsenceGroupModel;
+use App\Models\AlreadyAbsentException;
+use App\Models\EndBeforeStartDateException;
 use App\Models\EntryStatus;
+use App\Models\InvalidPersonException;
+use App\Models\MaxDaysExceededException;
+use App\Models\NoCustodyException;
 use App\Models\ProcuratAbsence;
 use App\Models\ProcuratFollowup;
+use App\Models\ProcuratPerson;
+use App\Models\EndBeforeStartTimeException;
+use App\Models\MinDateUndercutException;
 use Mpdf\MpdfException;
 use function App\Helpers\user;
+
+/**
+ * @throws MinDateUndercutException
+ * @throws EndBeforeStartDateException
+ * @throws MaxDaysExceededException
+ * @throws InvalidPersonException
+ * @throws EndBeforeStartTimeException
+ * @throws AlreadyAbsentException
+ * @throws NoCustodyException
+ */
+function reportAbsent(int $personId, string $startDateString, string $startIndex, string $endDateString, string $endIndex, string $reason): void
+{
+    $minDate = getMinAbsenceDate();
+    $startDate = DateTimeImmutable::createFromFormat('Y-m-d', $startDateString);
+    if ($minDate > $startDate) {
+        throw new MinDateUndercutException();
+    }
+
+    $endDate = DateTimeImmutable::createFromFormat('Y-m-d', $endDateString);
+    if ($startDate > $endDate) {
+        throw new EndBeforeStartDateException();
+    }
+
+    $dateDiff = $endDate->diff($startDate)->days;
+    if ($dateDiff > getMaxAbsenceDays()) {
+        throw new MaxDaysExceededException();
+    }
+
+    if ($startIndex != -1 && $endIndex != -1) {
+        if ($dateDiff == 0 && $startIndex > $endIndex) {
+            throw new EndBeforeStartTimeException();
+        }
+    }
+
+    $person = getProcuratPerson($personId);
+    if (!$person) {
+        throw new InvalidPersonException();
+    }
+
+    $user = user();
+    if (!isProcuratChildCustodyRelationship($user->getProcuratId(), $personId)) {
+        throw new NoCustodyException();
+    }
+
+    $absences = getAbsencesByPersonId($personId);
+    for ($i = 0; $i < $dateDiff + 1; $i++) {
+        $currentDate = $startDate->add(new DateInterval('P' . $i . 'D'));
+        $currentReason = $reason;
+
+        // If first absence in sequence
+        if ($i == 0 && $startIndex != '-1') {
+            $currentReason .= ' ab ' . getReportTimeslots()[intval($startIndex)];
+        }
+
+        // If last absence in sequence
+        if ($i == $dateDiff && $endIndex != '-1') {
+            $currentReason .= ' bis ' . getReportTimeslots()[intval($endIndex)];
+        }
+
+        $absence = findAbsence($absences, $currentDate);
+        if ($absence) {
+            if (!isHalfDayAbsence($absence)) {
+                throw new AlreadyAbsentException();
+            }
+
+            deleteProcuratAbsence($absence->getId());
+        }
+
+        createProcuratAbsence($personId, $currentDate, $currentReason);
+    }
+}
+
+/**
+ * @param int $personId
+ * @return ProcuratPerson[]
+ */
+function findReportablePersons(int $personId): array
+{
+    $persons = [];
+    $ownPerson = getProcuratPerson($personId);
+    // Allow adult students to report themselves
+    if ($ownPerson && $ownPerson->isAdult() && $ownPerson->getFamilyRole() == 'child') {
+        $persons[] = $ownPerson;
+    }
+
+    $relationships = getProcuratRelationships($personId);
+    // Find children with custody flag set
+    foreach ($relationships as $relationship) {
+        if ($relationship->isCustody() && ($relationship->getRelationshipType() == 'son' || $relationship->getRelationshipType() == 'daughter')) {
+            $persons[] = getProcuratPerson($relationship->getPersonId());
+        }
+    }
+
+    return $persons;
+}
 
 /**
  * @param AbsenceGroupModel $group
@@ -99,4 +202,59 @@ function findFollowUpByPersonId(array $followUps, int $personId): ?ProcuratFollo
     }
 
     return null;
+}
+
+/**
+ * @return string[]
+ */
+function getReportReasons(): array
+{
+    return explode(',', getenv('absences.report.reasons'));
+}
+
+/**
+ * @return string[]
+ */
+function getReportTimeslots(): array
+{
+    return explode(',', getenv('absences.report.timeslots'));
+}
+
+
+/**
+ * @return int
+ */
+function getMaxAbsenceDays(): int
+{
+    return intval(getenv('absences.report.maxDays'));
+}
+
+/**
+ * @return DateTime
+ */
+function getMinAbsenceDate(): DateTime
+{
+    $now = new DateTime();
+    if ($now->getTimestamp() > getAbsenceDueDateTimestamp($now)) {
+        $now->modify('+1 weekdays');
+    }
+
+    return $now->setTime(0, 0);
+}
+
+/**
+ * @return string
+ */
+function getMinAbsenceDateFormatted(): string
+{
+    return getMinAbsenceDate()->format('Y-m-d');
+}
+
+/**
+ * @param DateTimeInterface $now
+ * @return int
+ */
+function getAbsenceDueDateTimestamp(DateTimeInterface $now): int
+{
+    return strtotime($now->format('Y-m-d') . ' ' . getenv('absences.report.dueTime'));
 }

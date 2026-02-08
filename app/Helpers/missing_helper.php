@@ -101,5 +101,5 @@ function findUncompletedAbsenceFollowUpsByPersonId(int $personId): array
 function isFollowUpToday(ProcuratFollowUp $followUp): bool
 {
     $dueDate = $followUp->getDueDate();
-    return $dueDate['day'] == date('d') && $dueDate['month'] == date('m') && $dueDate['year'] == date('Y');
+    return $dueDate->format('Y-m-d') == date('Y-m-d');
 }
