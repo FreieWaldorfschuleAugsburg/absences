@@ -34,5 +34,6 @@ return [
         'endBeforeStartTime' => 'The end time mustn\'t be before the start time.',
         'maxDaysExceeded' => 'Absences reports mustn\'t be longer than %s days.',
         'alreadyAbsentTimespan' => 'There\'s at least one absence already reported for the selected time period. Please adjust the absence period!',
+        'noCustody' => 'You\'re not permitted to report this person as absent.'
     ]
 ];

@@ -2,11 +2,11 @@
 
 use App\Models\AbsenceGroupModel;
 use App\Models\AlreadyAbsentException;
-use App\Models\DueTimeExceededException;
 use App\Models\EndBeforeStartDateException;
 use App\Models\EntryStatus;
 use App\Models\InvalidPersonException;
 use App\Models\MaxDaysExceededException;
+use App\Models\NoCustodyException;
 use App\Models\ProcuratAbsence;
 use App\Models\ProcuratFollowup;
 use App\Models\ProcuratPerson;
@@ -22,6 +22,7 @@ use function App\Helpers\user;
  * @throws InvalidPersonException
  * @throws EndBeforeStartTimeException
  * @throws AlreadyAbsentException
+ * @throws NoCustodyException
  */
 function reportAbsent(int $personId, string $startDateString, string $startIndex, string $endDateString, string $endIndex, string $reason): void
 {
@@ -50,6 +51,11 @@ function reportAbsent(int $personId, string $startDateString, string $startIndex
     $person = getProcuratPerson($personId);
     if (!$person) {
         throw new InvalidPersonException();
+    }
+
+    $user = user();
+    if (!isProcuratChildCustodyRelationship($user->getProcuratId(), $personId)) {
+        throw new NoCustodyException();
     }
 
     $absences = getAbsencesByPersonId($personId);
@@ -88,14 +94,15 @@ function findReportablePersons(int $personId): array
 {
     $persons = [];
     $ownPerson = getProcuratPerson($personId);
-    // TODO find better criteria
+    // Allow adult students to report themselves
     if ($ownPerson && $ownPerson->isAdult() && $ownPerson->getFamilyRole() == 'child') {
         $persons[] = $ownPerson;
     }
 
     $relationships = getProcuratRelationships($personId);
+    // Find children with custody flag set
     foreach ($relationships as $relationship) {
-        if ($relationship->getRelationshipType() == 'son' || $relationship->getRelationshipType() == 'daughter') {
+        if ($relationship->isCustody() && ($relationship->getRelationshipType() == 'son' || $relationship->getRelationshipType() == 'daughter')) {
             $persons[] = getProcuratPerson($relationship->getPersonId());
         }
     }

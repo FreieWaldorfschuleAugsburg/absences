@@ -188,7 +188,6 @@ function getAbsencesByPersonId(int $personId): array
 
 /**
  * @param ProcuratAbsence[] $absences
- * @param int $personId
  * @param DateTimeInterface $date
  * @return ProcuratAbsence|null
  */
@@ -310,6 +309,27 @@ function getProcuratRelationships(int $personId): array
         log_message('error', "Error getting relationships for person {$personId} {exception}", ['exception' => $e]);
     }
     return $relationships;
+}
+
+/**
+ * @param int $childPersonId
+ * @param int $parentPersonId
+ * @return bool
+ */
+function isProcuratChildCustodyRelationship(int $parentPersonId, int $childPersonId): bool
+{
+    if ($parentPersonId == $childPersonId) {
+        return true;
+    }
+
+    $relationships = getProcuratRelationships($parentPersonId);
+    foreach ($relationships as $relationship) {
+        if ($relationship->getPersonId() == $childPersonId && $relationship->isCustody() && ($relationship->getRelationshipType() == "son" || $relationship->getRelationshipType() == "daughter")) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
