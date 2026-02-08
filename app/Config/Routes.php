@@ -6,6 +6,7 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'IndexController::index', ['filter' => ['login', 'components']]);
+$routes->get('/absence_events/(:any)', 'AbsenceController::absenceEvents/$1', ['filter' => ['login']]);
 
 $routes->get('/logout', 'IndexController::logout', ['filter' => ['login', 'components']]);
 

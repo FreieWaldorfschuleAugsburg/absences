@@ -67,19 +67,36 @@ class AbsenceController extends BaseController
         try {
             reportAbsent($personId, $startDate, $startTime, $endDate, $endTime, $reason);
         } catch (MinDateUndercutException) {
-            return redirect('/')->with('error', lang('absences.index.minDateUndercut'));
+            return redirect('/')->with('error', lang('absences.error.minDateUndercut'));
         } catch (EndBeforeStartDateException) {
-            return redirect('/')->with('error', lang('absences.index.endBeforeStartDate'));
+            return redirect('/')->with('error', lang('absences.error.endBeforeStartDate'));
         } catch (EndBeforeStartTimeException) {
-            return redirect('/')->with('error', lang('absences.index.endBeforeStartTime'));
+            return redirect('/')->with('error', lang('absences.error.endBeforeStartTime'));
         } catch (MaxDaysExceededException) {
-            return redirect('/')->with('error', lang('absences.index.maxDaysExceeded'));
+            return redirect('/')->with('error', lang('absences.error.maxDaysExceeded'));
         } catch (InvalidPersonException) {
-            return redirect('/')->with('error', lang('absences.index.invalidPerson'));
+            return redirect('/')->with('error', lang('absences.error.invalidPerson'));
         } catch (AlreadyAbsentException) {
-            return redirect('/')->with('error', lang('absences.index.alreadyAbsent'));
+            return redirect('/')->with('error', lang('absences.error.alreadyAbsentTimespan'));
         }
 
-        return redirect('/')->with('success', lang('absences.index.reportSuccessful'));
+        return redirect('/')->with('success', lang('absences.reportSuccessful'));
+    }
+
+    public function absenceEvents(string $id): string
+    {
+        // TODO make safe (check relation)
+        $absences = getSchoolYearAbsencesByPersonId(intval($id));
+        $events = [];
+        foreach ($absences as $entry) {
+            $formattedDate = $entry->getDate()->format("Y-m-d");
+            $events[] = [
+                "title" => is_null($entry->getNote()) ? lang('absences.allDay') : $entry->getNote(),
+                "start" => $formattedDate,
+                "end" => $formattedDate,
+            ];
+        }
+
+        return json_encode($events);
     }
 }

@@ -150,6 +150,26 @@ function getAbsenceToday(int $personId): ?ProcuratAbsence
  * @param int $personId
  * @return ProcuratAbsence[]
  */
+function getSchoolYearAbsencesByPersonId(int $personId): array
+{
+    $absences = [];
+    $client = createAPIClient();
+
+    try {
+        $rawAbsences = decodeResponse($client->get('absences/person/' . $personId . '?type=schoolyear'));
+        foreach ($rawAbsences as $rawAbsence) {
+            $absences[] = constructProcuratAbsence($rawAbsence);
+        }
+    } catch (GuzzleException $e) {
+        log_message('error', "Error absences for person {$personId} {exception}", ['exception' => $e]);
+    }
+    return $absences;
+}
+
+/**
+ * @param int $personId
+ * @return ProcuratAbsence[]
+ */
 function getAbsencesByPersonId(int $personId): array
 {
     $absences = [];

@@ -1,17 +1,20 @@
 <?php
 
 return [
-    'index' => [
-        'minDateUndercut' => 'Abwesenheitsmeldungen müssen bis %s Uhr am ersten Tag der Abwesenheit erfolgt sein.',
-        'endBeforeStartDate' => 'Das Enddatum kann nicht vor dem Startdatum liegen.',
-        'endBeforeStartTime' => 'Die Endzeit kann nicht vor der Startzeit liegen.',
-        'maxDaysExceeded' => 'Eine Abwesenheitsmeldung darf sich maximal über %s Tage erstrecken.',
-        'invalidPerson' => 'Ungültige Person',
-        'alreadyAbsent' => 'Im gewählten Zeitraum liegt bereits min. eine Abwesenheitsmeldung vor. Bitte ändern Sie den Zeitraum!',
-        'reportSuccessful' => 'Vielen Dank! Wir haben Ihre Abwesenheitsmeldung erfolgreich verarbeitet.',
-    ],
+    'reportAbsence' => 'Abwesenheit melden',
+    'submitReport' => 'Meldung absenden',
+    'reportSuccessful' => 'Vielen Dank! Wir haben Ihre Abwesenheitsmeldung erfolgreich verarbeitet.',
+    'showAbsences' => 'Abwesenheiten anzeigen',
+    'allDay' => 'ganztägig',
+    'reason' => 'Abwesenheitsgrund',
+    'start' => 'Beginn der Abwesenheit',
+    'end' => 'Ende der Abwesenheit',
+    'schoolDayStart' => 'Schulbeginn',
+    'schoolDayEnd' => 'Schulschluss',
+    'checkAbsences' => 'Abwesenheiten prüfen',
+    'noEntries' => 'Keine Einträge',
     'group' => [
-        'view' => 'Gesamt',
+        'view' => 'Alle',
         'back' => 'Zurück',
         'note' => 'Bemerkung: ',
         'printAbsent' => 'Abw. drucken',
@@ -25,6 +28,11 @@ return [
         'invalidPerson' => 'Ungültige Person',
         'invalidGroup' => 'Ungültige Abwesenheitsgruppe',
         'alreadyAbsent' => 'Person ist bereits als abwesend eingetragen',
-        'noFollowUp' => 'Person nicht mehr als fehlend gemeldet'
+        'noFollowUp' => 'Person nicht mehr als fehlend gemeldet',
+        'minDateUndercut' => 'Abwesenheitsmeldungen müssen bis %s Uhr am ersten Tag der Abwesenheit erfolgt sein.',
+        'endBeforeStartDate' => 'Das Enddatum kann nicht vor dem Startdatum liegen.',
+        'endBeforeStartTime' => 'Die Endzeit kann nicht vor der Startzeit liegen.',
+        'maxDaysExceeded' => 'Eine Abwesenheitsmeldung darf sich maximal über %s Tage erstrecken.',
+        'alreadyAbsentTimespan' => 'Im gewählten Zeitraum liegt bereits min. eine Abwesenheitsmeldung vor. Bitte ändern Sie den Zeitraum!',
     ]
 ];
