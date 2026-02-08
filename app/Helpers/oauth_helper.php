@@ -40,6 +40,8 @@ function login(): RedirectResponse
         $userModel = createUserModel($username, $name, $procuratId, $oidc->getIdToken(), $oidc->getRefreshToken(), $groups);
         session()->set('USER', $userModel);
 
+        log_message('info', sprintf("User logged in (username=%s)", $username));
+
         return redirect('/');
     } catch (OpenIDConnectClientException $e) {
         throw new OAuthException('login', $e);
@@ -56,8 +58,9 @@ function logout(): RedirectResponse
     try {
         $user = user();
         session()->remove('USER');
-
         $oidc->signOut($user->getIdToken(), null);
+
+        log_message('info', sprintf("User logged out (username=%s)", $user->getUsername()));
     } catch (OpenIDConnectClientException $e) {
         throw new OAuthException('logout', $e);
     }

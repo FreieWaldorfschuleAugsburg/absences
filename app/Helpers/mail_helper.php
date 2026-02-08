@@ -19,6 +19,8 @@ function sendMail(array $recipients, string $subject, string $message): void
     $mailer->Subject = $subject;
     $mailer->Body = $message;
     $mailer->send();
+
+    log_message('info', sprintf('Sent mail (recipients=%s,subject=%s,message=%s', "[" . join(",", $recipients) . "]", $subject, $message));
 }
 
 /**

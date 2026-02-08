@@ -216,6 +216,8 @@ function createProcuratAbsence(int $personId, DateTimeInterface $date, string $r
                 'note' => $reason
             ]
         ]);
+
+        log_message('info', sprintf('Created absence for %s on %s with reason %s', $personId, $formattedDate, $reason));
     } catch (GuzzleException $e) {
         log_message('error', "Error creating absence {exception}", ['exception' => $e]);
     }
@@ -226,6 +228,7 @@ function deleteProcuratAbsence(int $absenceId): void
     $client = createAPIClient();
     try {
         $client->delete('absences/' . $absenceId);
+        log_message('info', sprintf('Deleted absence %s', $absenceId));
     } catch (GuzzleException $e) {
         log_message('error', "Error deleting absence {exception}", ['exception' => $e]);
     }
@@ -277,8 +280,31 @@ function createProcuratFollowUp(int $assignedGroupId, int $referencedPersonId, s
                 'message' => $message
             ]
         ]);
+
+        log_message('info', sprintf('Created follow-up (assignedGroupId=%s,referencedPersonId=%s,dueDate=%s,subject=%s,message=%s)',
+            $assignedGroupId, $referencedPersonId, $dueDate, $subject, $message));
     } catch (GuzzleException $e) {
         log_message('error', "Error creating follow-up {exception}", ['exception' => $e]);
+    }
+}
+
+/**
+ * @param int $followUpId
+ * @return void
+ */
+function completeProcuratFollowUp(int $followUpId): void
+{
+    $client = createAPIClient();
+    try {
+        $client->put('followups/' . $followUpId, [
+            'json' => [
+                'completed' => true
+            ]
+        ]);
+
+        log_message('info', sprintf('Completed follow-up (id=%s)', $followUpId));
+    } catch (GuzzleException $e) {
+        log_message('error', "Error completing follow-up {exception}", ['exception' => $e]);
     }
 }
 
@@ -287,6 +313,8 @@ function deleteProcuratFollowUp(int $followUpId): void
     $client = createAPIClient();
     try {
         $client->delete('followups/' . $followUpId);
+
+        log_message('info', sprintf('Deleted follow-up (id=%s)', $followUpId));
     } catch (GuzzleException $e) {
         log_message('error', "Error deleting follow-up {exception}", ['exception' => $e]);
     }
