@@ -51,6 +51,7 @@
                                            class="form-label mt-3"><?= lang('absences.reason') ?></label>
                                     <div class="input-group mb-3">
                                         <select class="form-select" id="inputReason" name="reason" required>
+                                            <option value="" selected disabled><?= lang('absences.pleaseSelect') ?></option>
                                             <?php foreach ($reasons as $reason) : ?>
                                                 <option value="<?= $reason ?>">
                                                     <?= $reason ?>
@@ -69,6 +70,7 @@
                                         <select class="form-select" id="inputStartTime" name="startTime"
                                                 aria-describedby="inputStart"
                                                 required>
+                                            <option value="" selected disabled><?= lang('absences.pleaseSelect') ?></option>
                                             <option value="-1"><?= lang('absences.schoolDayStart') ?></option>
                                             <?php $i = 0 ?>
                                             <?php foreach ($timeslots as $timeslot) : ?>
@@ -88,6 +90,7 @@
                                         <select class="form-select" id="inputEndTime" name="endTime"
                                                 aria-describedby="inputEnd"
                                                 required>
+                                            <option value="" selected disabled><?= lang('absences.pleaseSelect') ?></option>
                                             <option value="-1"><?= lang('absences.schoolDayEnd') ?></option>
                                             <?php $i = 0 ?>
                                             <?php foreach ($timeslots as $timeslot) : ?>

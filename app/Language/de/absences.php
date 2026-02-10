@@ -6,6 +6,7 @@ return [
     'reportSuccessful' => 'Vielen Dank! Wir haben Ihre Abwesenheitsmeldung erfolgreich verarbeitet.',
     'showAbsences' => 'Abwesenheiten anzeigen',
     'allDay' => 'ganztägig',
+    'pleaseSelect' => '– Bitte wählen –',
     'reason' => 'Abwesenheitsgrund',
     'start' => 'Beginn der Abwesenheit',
     'end' => 'Ende der Abwesenheit',

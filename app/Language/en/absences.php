@@ -6,6 +6,7 @@ return [
     'reportSuccessful' => 'Thank you! We\'ve successfully processed you\'r absence report!',
     'showAbsences' => 'Show absences',
     'allDay' => 'all-day',
+    'pleaseSelect' => '– Please select –',
     'reason' => 'Reason of absence',
     'start' => 'Start of absence',
     'end' => 'End of absence',
