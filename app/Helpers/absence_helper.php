@@ -177,8 +177,7 @@ function generateEntries(AbsenceGroupModel $group, array $ignoreStatus): array
 function findAbsenceByPersonId(array $absences, int $personId): ?ProcuratAbsence
 {
     foreach ($absences as $absence) {
-        // Only match if excused
-        if ($absence->getPersonId() == $personId && $absence->isExcused()) {
+        if ($absence->getPersonId() == $personId) {
             return $absence;
         }
     }

@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use DateTime;
+use JsonSerializable;
 
-class ProcuratPerson
+class ProcuratPerson implements JsonSerializable
 {
     private int $id;
     private ?string $firstName;
@@ -77,5 +78,12 @@ class ProcuratPerson
 
         $age = DateTime::createFromFormat('Y-m-d\TH:i:sp', $this->birthDate)->diff(new DateTime('now'))->y;
         return $age >= 18;
+    }
+
+    public function jsonSerialize(): array
+    {
+        $jsonArray = get_object_vars($this);
+        $jsonArray['fullName'] = $this->getFullName();
+        return $jsonArray;
     }
 }

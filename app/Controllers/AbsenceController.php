@@ -17,6 +17,10 @@ use function App\Helpers\user;
 
 class AbsenceController extends BaseController
 {
+    /**
+     * @param string $id
+     * @return string|RedirectResponse
+     */
     public function view(string $id): string|RedirectResponse
     {
         $group = getAbsenceGroup($id);
@@ -24,7 +28,7 @@ class AbsenceController extends BaseController
             return redirect('/')->with('error', lang('absences.error.invalidGroup'));
         }
 
-        return view('AbsenceView', ['group' => $group, 'entries' => generateEntries($group, [])]);
+        return view('AbsenceView', ['group' => $group]);
     }
 
     /**
@@ -57,6 +61,9 @@ class AbsenceController extends BaseController
         exit;
     }
 
+    /**
+     * @return RedirectResponse
+     */
     public function reportAbsent(): RedirectResponse
     {
         $personId = $this->request->getPost('person');
@@ -87,7 +94,12 @@ class AbsenceController extends BaseController
         return redirect('/')->with('success', lang('absences.reportSuccessful'));
     }
 
-    public function absenceEvents(string $id): string
+    /**
+     * @param string $id
+     * @return string
+     * @throws OAuthException
+     */
+    public function apiAbsenceEvents(string $id): string
     {
         $person = getProcuratPerson(intval($id));
         if (!$person) {
@@ -113,4 +125,16 @@ class AbsenceController extends BaseController
         }
         return json_encode($events);
     }
+
+    public function apiEntries(string $id): string
+    {
+        $group = getAbsenceGroup($id);
+        if (!$group) {
+            $this->response->setStatusCode(404);
+            return "";
+        }
+
+        return json_encode(generateEntries($group, []));
+    }
+
 }

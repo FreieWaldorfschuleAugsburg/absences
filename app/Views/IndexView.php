@@ -147,7 +147,7 @@
                     buttonText: {
                         today: 'Heute'
                     },
-                    events: '/absence_events/' + id,
+                    events: '/api/absence_events/' + id,
                     noEventsContent: '<?= lang('absences.noEntries') ?>',
                     allDayText: ''
                 });
