@@ -14,25 +14,28 @@ class MissingController extends BaseController
     /**
      * @throws OAuthException
      */
-    public function reportMissing(int $personId): string|RedirectResponse
+    public function reportMissing(int $personId): string
     {
         try {
             reportMissing($personId, user()->getDisplayName());
-            return redirect()->back();
+            return "";
         } catch (AlreadyAbsentException) {
-            return redirect()->back()->with('error', lang('absences.error.alreadyAbsent'));
+            $this->response->setStatusCode(400);
+            return lang('absences.error.alreadyAbsent');
         } catch (InvalidPersonException) {
-            return redirect()->back()->with('error', lang('absences.error.invalidPerson'));
+            $this->response->setStatusCode(400);
+            return lang('absences.error.invalidPerson');
         }
     }
 
-    public function revokeMissing(int $personId): string|RedirectResponse
+    public function revokeMissing(int $personId): string
     {
         try {
             revokeMissing($personId);
-            return redirect()->back();
+            return "";
         } catch (InvalidPersonException) {
-            return redirect()->back()->with('error', lang('absences.error.invalidPerson'));
+            $this->response->setStatusCode(400);
+            return lang('absences.error.invalidPerson');
         }
     }
 

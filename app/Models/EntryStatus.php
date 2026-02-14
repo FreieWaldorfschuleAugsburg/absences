@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-enum EntryStatus
+use JsonSerializable;
+
+enum EntryStatus implements JsonSerializable
 {
     case Present;
     case Absent;
@@ -16,5 +18,13 @@ enum EntryStatus
             EntryStatus::Absent => 'bg-red',
             EntryStatus::HalfDay, EntryStatus::Missing => 'bg-orange'
         };
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'name' => $this->name,
+            'color' => $this->getBackgroundColorClass()
+        ];
     }
 }

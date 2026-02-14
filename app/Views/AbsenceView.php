@@ -46,45 +46,73 @@ use App\Models\EntryStatus;
     </div>
 </div>
 
-<div class="row">
-    <?php foreach ($entries as $entry) : ?>
-        <div class="col-lg-4">
-            <div class="card <?= $entry['status']->getBackgroundColorClass() ?> mb-3">
-                <div class="card-body">
-                    <h5><?= $entry['person']->getFullName() ?></h5>
-                    <?php if (key_exists('note', $entry)): ?>
-                        <small><b><?= lang('absences.group.note') ?></b></small><small
-                                onmouseenter="blurText(this, false)" onmouseleave="blurText(this, true)"
-                                class="blurred"> <?= $entry['note'] ?></small>
-                    <?php else: ?>
-                        <small>&nbsp;</small>
-                    <?php endif; ?>
-                </div>
-                <div class="card-footer absence-card-footer">
-                    <?php if ($entry['status'] != EntryStatus::Absent && $entry['status'] != EntryStatus::Missing): ?>
-                        <button class="btn btn-danger btn-sm"
-                                onclick="confirmRedirect('<?= base_url('report_missing/') . $entry['person']->getId() ?>')">
-                            <i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>
-                        </button>
-                    <?php endif; ?>
-
-                    <?php if ($entry['status'] == EntryStatus::Missing): ?>
-                        <button class="btn btn-success btn-sm"
-                                onclick="confirmRedirect('<?= base_url('revoke_missing/') . $entry['person']->getId() ?>')">
-                            <i class="fas fa-person-circle-check"></i> <?= lang('absences.group.revokeMissing') ?>
-                        </button>
-                    <?php endif; ?>
-                </div>
-            </div>
-        </div>
-    <?php endforeach; ?>
+<div id="entryRow" class="row">
+    <div class="text-center">
+        <h1><i class="fas fa-spinner fa-2xl fa-spin mt-5 mb-5"></i></h1>
+        <h2>Einträge werden geladen ...</h2>
+    </div>
 </div>
 
 <script>
-    function confirmRedirect(url) {
-        if (confirm('<?= lang('app.confirm') ?>')) {
-            window.location.href = url;
-        }
+    document.addEventListener("DOMContentLoaded", function () {
+        updateEntries();
+
+        setInterval(() => updateEntries(), 10000)
+    });
+
+    function updateEntries() {
+        axios.get('<?= base_url('api/entries') ?>/<?= $group->getId() ?>')
+            .then(function (response) {
+                let innerHTML = "";
+                for (const entry of response.data) {
+                    innerHTML += '<div class="col-lg-4">' +
+                        '<div class="card ' + entry.status.color + ' mb-3">' +
+                        '<div class="card-body">' +
+                        '<h5>' + entry.person.fullName + '</h5>'
+
+                    if (Object.hasOwn(entry, 'note')) {
+                        innerHTML += '<small><b><?= lang('absences.group.note') ?></b></small>' +
+                            '<small onmouseenter="blurText(this, false)" onmouseleave="blurText(this, true)" class="blurred">' + entry.note + '</small>'
+                    } else {
+                        innerHTML += '<small>&nbsp;</small>'
+                    }
+
+                    innerHTML += '</div><div class="card-footer absence-card-footer">';
+
+                    if (entry.status.name !== 'Absent' && entry.status.name !== 'Missing') {
+                        innerHTML += '<button class="btn btn-danger btn-sm" onclick="reportMissing(this, \'' + entry.person.id + '\')">' +
+                            '<i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>' +
+                            '</button>';
+                    }
+
+                    if (entry.status.name === 'Missing') {
+                        innerHTML += '<button class="btn btn-success btn-sm" onclick="revokeMissing(this, \'' + entry.person.id + '\')">' +
+                            '<i class="fas fa-person-circle-check"></i> <?= lang('absences.group.revokeMissing') ?>' +
+                            '</button>';
+                    }
+
+                    innerHTML += '</div></div></div>';
+                }
+
+                const row = document.getElementById('entryRow');
+                row.innerHTML = innerHTML;
+            });
+    }
+
+    function reportMissing(object, personId) {
+        object.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'
+        axios.get('<?= base_url('report_missing') ?>/' + personId)
+            .then(function () {
+                setTimeout(() => updateEntries(), 500);
+            });
+    }
+
+    function revokeMissing(object, personId) {
+        object.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'
+        axios.get('<?= base_url('revoke_missing') ?>/' + personId)
+            .then(function () {
+                setTimeout(() => updateEntries(), 500);
+            });
     }
 
     function blurText(element, blur) {
