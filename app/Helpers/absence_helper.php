@@ -99,12 +99,26 @@ function findReportablePersons(int $personId): array
         $persons[] = $ownPerson;
     }
 
+    $rootGroupMemberships = getProcuratRootGroupMemberships();
+
     $relationships = getProcuratRelationships($personId);
-    // Find children with custody flag set
     foreach ($relationships as $relationship) {
-        if ($relationship->isCustody() && ($relationship->getRelationshipType() == 'son' || $relationship->getRelationshipType() == 'daughter')) {
-            $persons[] = getProcuratPerson($relationship->getPersonId());
+        // Skip persons not member of root group (person is inactive)
+        if (!getProcuratGroupMembershipsByPersonId($rootGroupMemberships, $relationship->getPersonId())) {
+            continue;
         }
+
+        // Skip persons who we have no custody for
+        if (!$relationship->isCustody()) {
+            continue;
+        }
+
+        // Skip persons who aren't children
+        if ($relationship->getRelationshipType() != 'son' && $relationship->getRelationshipType() != 'daughter') {
+            continue;
+        }
+
+        $persons[] = getProcuratPerson($relationship->getPersonId());
     }
 
     return $persons;

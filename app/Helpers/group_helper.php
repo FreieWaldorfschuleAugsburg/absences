@@ -53,7 +53,7 @@ function findAbsenceGroupMembers(AbsenceGroupModel $group): array
     $persons = [];
 
     foreach ($group->getGroupIds() as $groupId) {
-        $memberships = getGroupMembershipsByGroupId(intval($groupId));
+        $memberships = getProcuratGroupMembershipsByGroupId(intval($groupId));
 
         foreach ($memberships as $membership) {
             $match = true;

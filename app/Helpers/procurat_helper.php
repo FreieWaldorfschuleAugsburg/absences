@@ -34,7 +34,7 @@ function createAPIClient(): Client
  * @param int $groupId
  * @return ProcuratGroupMembership[]
  */
-function getGroupMembershipsByGroupId(int $groupId): array
+function getProcuratGroupMembershipsByGroupId(int $groupId): array
 {
     $client = createAPIClient();
     $memberships = [];
@@ -47,6 +47,29 @@ function getGroupMembershipsByGroupId(int $groupId): array
         log_message('error', "Error getting group memberships for group {$groupId} {exception}", ['exception' => $e]);
     }
     return $memberships;
+}
+
+/**
+ * @return ProcuratGroupMembership[]
+ */
+function getProcuratRootGroupMemberships(): array
+{
+    return getProcuratGroupMembershipsByGroupId(intval(getenv('procurat.rootGroupId')));
+}
+
+/**
+ * @param ProcuratGroupMembership[] $memberships
+ * @param int $memberPersonId
+ * @return ProcuratGroupMembership|null
+ */
+function getProcuratGroupMembershipsByPersonId(array $memberships, int $memberPersonId): ?ProcuratGroupMembership
+{
+    foreach ($memberships as $membership) {
+        if ($membership->getPersonId() == $memberPersonId)
+            return $membership;
+    }
+
+    return null;
 }
 
 /**
