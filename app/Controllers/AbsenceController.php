@@ -76,13 +76,13 @@ class AbsenceController extends BaseController
         try {
             reportAbsent($personId, $startDate, $startTime, $endDate, $endTime, $reason);
         } catch (MinDateUndercutException) {
-            return redirect('/')->with('error', lang('absences.error.minDateUndercut'));
+            return redirect('/')->with('error', sprintf(lang('absences.error.minDateUndercut'), getenv('absences.report.dueTime')));
         } catch (EndBeforeStartDateException) {
             return redirect('/')->with('error', lang('absences.error.endBeforeStartDate'));
         } catch (EndBeforeStartTimeException) {
             return redirect('/')->with('error', lang('absences.error.endBeforeStartTime'));
         } catch (MaxDaysExceededException) {
-            return redirect('/')->with('error', lang('absences.error.maxDaysExceeded'));
+            return redirect('/')->with('error', sprintf(lang('absences.error.maxDaysExceeded'), getMaxAbsenceDays()));
         } catch (InvalidPersonException) {
             return redirect('/')->with('error', lang('absences.error.invalidPerson'));
         } catch (AlreadyAbsentException) {

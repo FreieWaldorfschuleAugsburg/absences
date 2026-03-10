@@ -35,6 +35,6 @@ return [
         'endBeforeStartTime' => 'Die Endzeit kann nicht vor der Startzeit liegen.',
         'maxDaysExceeded' => 'Eine Abwesenheitsmeldung darf sich maximal über %s Tage erstrecken.',
         'alreadyAbsentTimespan' => 'Im gewählten Zeitraum liegt bereits min. eine Abwesenheitsmeldung vor. Bitte ändern Sie den Zeitraum!',
-        'noCustody' => 'Sie sind dazu nicht berechtigt, diese Person abwesend zu melden.'
+        'noCustody' => 'Sie sind nicht dazu berechtigt, diese Person abwesend zu melden.'
     ]
 ];
