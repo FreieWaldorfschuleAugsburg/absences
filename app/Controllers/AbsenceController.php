@@ -6,12 +6,14 @@ use App\Models\AlreadyAbsentException;
 use App\Models\EndBeforeStartDateException;
 use App\Models\EndBeforeStartTimeException;
 use App\Models\EntryStatus;
+use App\Models\FullDayReasonException;
 use App\Models\InvalidPersonException;
 use App\Models\MaxDaysExceededException;
 use App\Models\NoCustodyException;
 use App\Models\OAuthException;
 use App\Models\MinDateUndercutException;
 use CodeIgniter\HTTP\RedirectResponse;
+use DateTimeImmutable;
 use Mpdf\MpdfException;
 use function App\Helpers\user;
 
@@ -89,6 +91,8 @@ class AbsenceController extends BaseController
             return redirect('/')->with('error', lang('absences.error.alreadyAbsentTimespan'));
         } catch (NoCustodyException) {
             return redirect('/')->with('error', lang('absences.error.noCustody'));
+        } catch (FullDayReasonException $e) {
+            return redirect('/')->with('error', lang('absences.error.fullDayReason'));
         }
 
         return redirect('/')->with('success', lang('absences.reportSuccessful'));
@@ -135,6 +139,51 @@ class AbsenceController extends BaseController
         }
 
         return json_encode(generateEntries($group, []));
+    }
+
+    /**
+     * @param string $id
+     * @return string
+     * @throws OAuthException
+     */
+    public function apiReportLate(string $id): string
+    {
+        $person = getProcuratPerson(intval($id));
+        if (!$person) {
+            $this->response->setStatusCode(404);
+            return "";
+        }
+
+        $now = new DateTimeImmutable();
+        createProcuratAbsence($person->getId(), $now, sprintf(getenv('absences.lateReason'), user()->getDisplayName(), $now->format("H:i")));
+        return "";
+    }
+
+    /**
+     * @param string $id
+     * @return string
+     * @throws OAuthException
+     */
+    public function apiReportLeave(string $id): string
+    {
+        $person = getProcuratPerson(intval($id));
+        if (!$person) {
+            $this->response->setStatusCode(404);
+            return "";
+        }
+
+        $now = new DateTimeImmutable();
+        $leaveReason = sprintf(getenv('absences.leaveReason'), user()->getDisplayName(), $now->format("H:i"));
+
+        // Check absence already exists
+        $absence = getAbsenceToday($person->getId());
+        if ($absence) {
+            $leaveReason = $absence->getNote() . ', ' . $leaveReason;
+            deleteProcuratAbsence($absence->getId());
+        }
+
+        createProcuratAbsence($person->getId(), $now, $leaveReason);
+        return "";
     }
 
 }

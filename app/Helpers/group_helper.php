@@ -76,18 +76,3 @@ function findAbsenceGroupMembers(AbsenceGroupModel $group): array
 
     return $persons;
 }
-
-function isHalfDayAbsence(ProcuratAbsence $absence): bool
-{
-    $lowercaseKeywords = mb_strtolower(getenv('absences.halfDayKeywords'));
-    $lowercaseNote = mb_strtolower($absence->getNote());
-    $keywords = explode(',', $lowercaseKeywords);
-
-    foreach ($keywords as $keyword) {
-        if (str_contains($lowercaseNote, $keyword)) {
-            return true;
-        }
-    }
-
-    return false;
-}

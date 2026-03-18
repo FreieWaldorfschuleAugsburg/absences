@@ -244,6 +244,14 @@ function createProcuratAbsence(int $personId, DateTimeInterface $date, string $r
     } catch (GuzzleException $e) {
         log_message('error', "Error creating absence {exception}", ['exception' => $e]);
     }
+
+    // Delete today's absence followups
+    $followUps = findUncompletedAbsenceFollowUpsByPersonId($personId);
+    foreach ($followUps as $followUp) {
+        if (!isFollowUpToday($followUp)) continue;
+
+        deleteProcuratFollowUp($followUp->getId());
+    }
 }
 
 function deleteProcuratAbsence(int $absenceId): void

@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
         <a class="navbar-brand" href="<?= base_url('/') ?>">
-            <img src="<?= base_url('/') ?>/assets/img/logo.png" width="30" height="30" class="d-inline-block align-top"
+            <img src="<?= base_url('/') ?>assets/img/logo.png" width="30" height="30" class="d-inline-block align-top"
                  alt="">
             <?= lang('app.name.short') ?>
         </a>

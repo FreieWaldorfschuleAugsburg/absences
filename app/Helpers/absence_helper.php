@@ -4,6 +4,7 @@ use App\Models\AbsenceGroupModel;
 use App\Models\AlreadyAbsentException;
 use App\Models\EndBeforeStartDateException;
 use App\Models\EntryStatus;
+use App\Models\FullDayReasonException;
 use App\Models\InvalidPersonException;
 use App\Models\MaxDaysExceededException;
 use App\Models\NoCustodyException;
@@ -23,6 +24,7 @@ use function App\Helpers\user;
  * @throws EndBeforeStartTimeException
  * @throws AlreadyAbsentException
  * @throws NoCustodyException
+ * @throws FullDayReasonException
  */
 function reportAbsent(int $personId, string $startDateString, string $startIndex, string $endDateString, string $endIndex, string $reason): void
 {
@@ -56,6 +58,11 @@ function reportAbsent(int $personId, string $startDateString, string $startIndex
     $user = user();
     if (!isProcuratChildCustodyRelationship($user->getProcuratId(), $personId)) {
         throw new NoCustodyException();
+    }
+
+    $fullDayReasons = getReportFullDayReasons();
+    if (in_array($reason, $fullDayReasons) && ($startIndex != '-1' || $endIndex != '-1')) {
+        throw new FullDayReasonException();
     }
 
     $absences = getAbsencesByPersonId($personId);
@@ -217,12 +224,38 @@ function findFollowUpByPersonId(array $followUps, int $personId): ?ProcuratFollo
     return null;
 }
 
+function isHalfDayAbsence(ProcuratAbsence $absence): bool
+{
+    $keywords = explode(',', mb_strtolower(getenv('absences.halfDayKeywords')));
+    $note = mb_strtolower($absence->getNote());
+    $noteSplit = explode(',', $note);
+
+    $halfDay = false;
+    foreach ($noteSplit as $note) {
+        $localHalfDay = false;
+        foreach ($keywords as $keyword) {
+            if (str_contains($note, $keyword)) {
+                $localHalfDay = true;
+            }
+        }
+
+        $halfDay = $localHalfDay;
+    }
+
+    return $halfDay;
+}
+
 /**
  * @return string[]
  */
 function getReportReasons(): array
 {
     return explode(',', getenv('absences.report.reasons'));
+}
+
+function getReportFullDayReasons(): array
+{
+    return explode(',', getenv('absences.report.fullDayReasons'));
 }
 
 /**

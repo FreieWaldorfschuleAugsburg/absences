@@ -1,8 +1,3 @@
-<?php
-
-use App\Models\EntryStatus;
-
-?>
 <div class="row mt-3 justify-content-center">
     <div class="col-lg-12">
         <?= isset($error) ? '<div class="alert alert-danger mb-3"> <i class="fas fa-exclamation-triangle"></i> <b>' . lang('index.error') . '</b> ' . $error . '</div>' : '' ?>
@@ -49,7 +44,7 @@ use App\Models\EntryStatus;
 <div id="entryRow" class="row">
     <div class="text-center">
         <h1><i class="fas fa-spinner fa-2xl fa-spin mt-5 mb-5"></i></h1>
-        <h2>Einträge werden geladen ...</h2>
+        <h2><?= lang('absences.group.loading') ?></h2>
     </div>
 </div>
 
@@ -77,21 +72,31 @@ use App\Models\EntryStatus;
                         innerHTML += '<small>&nbsp;</small>'
                     }
 
-                    innerHTML += '</div><div class="card-footer absence-card-footer">';
+                    innerHTML += '</div><div class="card-footer absence-card-footer text-center">';
 
+                    innerHTML += '<div class="btn btn-group">'
                     if (entry.status.name !== 'Absent' && entry.status.name !== 'Missing') {
-                        innerHTML += '<button class="btn btn-danger btn-sm" onclick="reportMissing(this, \'' + entry.person.id + '\')">' +
-                            '<i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>' +
+                        if (entry.status.name !== 'Missing') {
+                            innerHTML += '<button class="btn btn-danger mr-3 btn-sm" onclick="reportMissing(this, \'' + entry.person.id + '\')">' +
+                                '<i class="fas fa-person-circle-xmark"></i> <?= lang('absences.group.reportMissing') ?>' +
+                                '</button>';
+                        }
+
+                        innerHTML += '<button class="btn btn-danger btn-sm" onclick="reportLeave(this, \'' + entry.person.id + '\')">' +
+                            '<i class="fas fa-person-walking-arrow-right"></i> <?= lang('absences.group.reportLeave') ?>' +
                             '</button>';
                     }
 
                     if (entry.status.name === 'Missing') {
-                        innerHTML += '<button class="btn btn-success btn-sm" onclick="revokeMissing(this, \'' + entry.person.id + '\')">' +
+                        innerHTML += '<button class="btn btn-success mr-3 btn-sm" onclick="revokeMissing(this, \'' + entry.person.id + '\')">' +
                             '<i class="fas fa-person-circle-check"></i> <?= lang('absences.group.revokeMissing') ?>' +
+                            '</button>';
+                        innerHTML += '<button class="btn btn-danger btn-sm" onclick="reportLate(this, \'' + entry.person.id + '\')">' +
+                            '<i class="fas fa-user-clock"></i> <?= lang('absences.group.reportLate') ?>' +
                             '</button>';
                     }
 
-                    innerHTML += '</div></div></div>';
+                    innerHTML += '</div></div></div></div>';
                 }
 
                 const row = document.getElementById('entryRow');
@@ -100,19 +105,26 @@ use App\Models\EntryStatus;
     }
 
     function reportMissing(object, personId) {
-        object.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'
-        axios.get('<?= base_url('report_missing') ?>/' + personId)
-            .then(function () {
-                setTimeout(() => updateEntries(), 500);
-            });
+        handleRequest(object, '<?= base_url('api/report_missing') ?>/' + personId);
     }
 
     function revokeMissing(object, personId) {
+        handleRequest(object, '<?= base_url('api/revoke_missing') ?>/' + personId);
+    }
+
+    function reportLate(object, personId) {
+        handleRequest(object, '<?= base_url('api/report_late') ?>/' + personId);
+    }
+
+    function reportLeave(object, personId) {
+        handleRequest(object, '<?= base_url('api/report_leave') ?>/' + personId);
+    }
+
+    function handleRequest(object, url) {
         object.innerHTML = '<i class="fas fa-spinner fa-spin"></i>'
-        axios.get('<?= base_url('revoke_missing') ?>/' + personId)
-            .then(function () {
-                setTimeout(() => updateEntries(), 500);
-            });
+        axios.get(url).then(function () {
+            setTimeout(() => updateEntries(), 500);
+        });
     }
 
     function blurText(element, blur) {

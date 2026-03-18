@@ -15,6 +15,7 @@ return [
     'checkAbsences' => 'Abwesenheiten prüfen',
     'noEntries' => 'Keine Einträge',
     'group' => [
+        'loading' => 'Einträge werden geladen ...',
         'view' => 'Alle',
         'back' => 'Zurück',
         'note' => 'Bemerkung: ',
@@ -22,6 +23,8 @@ return [
         'printPresent' => 'Anw. drucken',
         'reportMissing' => 'Fehlend melden',
         'revokeMissing' => 'Meldung zurücknehmen',
+        'reportLate' => 'Verspätung eintragen',
+        'reportLeave' => 'Gegangen eintragen',
         'deviationNotice' => 'Bitte beachten Sie, dass die Abwesenheiten im Sekretariat i.d.R. erst bis um 8:30 Uhr vollständig bearbeitet wurden. Es ergeben sich daher ggf. noch Änderungen!',
         'officeHoursNotice' => 'Bitte beachten Sie, dass das Sekretariat ab 13:30 Uhr nicht mehr besetzt ist. Meldungen unentschuldigten Fehlens werden im Sekretariat erst am nächsten Tag bearbeitet. Kontaktieren Sie die Eltern bitte selbstständig!'
     ],
@@ -35,6 +38,7 @@ return [
         'endBeforeStartTime' => 'Die Endzeit kann nicht vor der Startzeit liegen.',
         'maxDaysExceeded' => 'Eine Abwesenheitsmeldung darf sich maximal über %s Tage erstrecken.',
         'alreadyAbsentTimespan' => 'Im gewählten Zeitraum liegt bereits min. eine Abwesenheitsmeldung vor. Bitte ändern Sie den Zeitraum!',
-        'noCustody' => 'Sie sind nicht dazu berechtigt, diese Person abwesend zu melden.'
+        'noCustody' => 'Sie sind nicht dazu berechtigt, diese Person abwesend zu melden.',
+        'fullDayReason' => 'Der gewählte Abwesenheitsgrund kann nur für ganztägige Abwesenheiten verwendet werden.',
     ]
 ];

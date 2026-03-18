@@ -14,7 +14,7 @@ class MissingController extends BaseController
     /**
      * @throws OAuthException
      */
-    public function reportMissing(int $personId): string
+    public function apiReportMissing(int $personId): string
     {
         try {
             reportMissing($personId, user()->getDisplayName());
@@ -28,7 +28,7 @@ class MissingController extends BaseController
         }
     }
 
-    public function revokeMissing(int $personId): string
+    public function apiRevokeMissing(int $personId): string
     {
         try {
             revokeMissing($personId);

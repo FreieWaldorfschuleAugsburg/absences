@@ -50,8 +50,10 @@
                                     <label for="inputReason"
                                            class="form-label mt-3"><?= lang('absences.reason') ?></label>
                                     <div class="input-group mb-3">
-                                        <select class="form-select" id="inputReason" name="reason" required>
-                                            <option value="" selected disabled><?= lang('absences.pleaseSelect') ?></option>
+                                        <select class="form-select" id="inputReason" name="reason"
+                                                onchange="onReasonChange(this)" required>
+                                            <option value="" selected
+                                                    disabled><?= lang('absences.pleaseSelect') ?></option>
                                             <?php foreach ($reasons as $reason) : ?>
                                                 <option value="<?= $reason ?>">
                                                     <?= $reason ?>
@@ -65,12 +67,13 @@
                                         <input class="form-control" type="date" id="inputStartDate" name="startDate"
                                                value="<?= $minDate = getMinAbsenceDateFormatted() ?>"
                                                min="<?= $minDate ?>"
-                                               onchange="adjustDate(this, document.getElementById('inputEndDate'), false)"
+                                               onchange="onDateChange(this, document.getElementById('inputEndDate'), false)"
                                                aria-describedby="inputStart" required>
                                         <select class="form-select" id="inputStartTime" name="startTime"
                                                 aria-describedby="inputStart"
                                                 required>
-                                            <option value="" selected disabled><?= lang('absences.pleaseSelect') ?></option>
+                                            <option value="" selected
+                                                    disabled><?= lang('absences.pleaseSelect') ?></option>
                                             <option value="-1"><?= lang('absences.schoolDayStart') ?></option>
                                             <?php $i = 0 ?>
                                             <?php foreach ($timeslots as $timeslot) : ?>
@@ -85,12 +88,13 @@
                                     <div class="input-group mb-3">
                                         <input class="form-control" type="date" id="inputEndDate" name="endDate"
                                                value="<?= $minDate ?>" min="<?= $minDate ?>" aria-describedby="inputEnd"
-                                               onchange="adjustDate(this, document.getElementById('inputStartDate'), true)"
+                                               onchange="onDateChange(this, document.getElementById('inputStartDate'), true)"
                                                required>
                                         <select class="form-select" id="inputEndTime" name="endTime"
                                                 aria-describedby="inputEnd"
                                                 required>
-                                            <option value="" selected disabled><?= lang('absences.pleaseSelect') ?></option>
+                                            <option value="" selected
+                                                    disabled><?= lang('absences.pleaseSelect') ?></option>
                                             <option value="-1"><?= lang('absences.schoolDayEnd') ?></option>
                                             <?php $i = 0 ?>
                                             <?php foreach ($timeslots as $timeslot) : ?>
@@ -156,13 +160,25 @@
             calendar.render();
         }
 
-        function adjustDate(originObject, targetObject, reverseComparison) {
+        function onDateChange(originObject, targetObject, reverseComparison) {
             const originDate = Date.parse(originObject.value);
             const targetDate = Date.parse(targetObject.value);
 
             if ((!reverseComparison && originDate > targetDate) || (reverseComparison && originDate < targetDate)) {
                 targetObject.value = originObject.value;
             }
+        }
+
+        function onReasonChange(object) {
+            const fullDaysReasons = "<?= getenv('absences.report.fullDayReasons') ?>".split(",");
+            const reason = object.options[object.selectedIndex].text;
+            const isFullDay = fullDaysReasons.includes(reason);
+
+            const inputStartTime = document.getElementById('inputStartTime');
+            const inputEndTime = document.getElementById('inputEndTime');
+
+            inputStartTime.value = inputEndTime.value = isFullDay ? '-1' : '';
+            inputStartTime.style.pointerEvents = inputEndTime.style.pointerEvents = isFullDay ? 'none' : 'auto';
         }
     </script>
 <?php endif; ?>
