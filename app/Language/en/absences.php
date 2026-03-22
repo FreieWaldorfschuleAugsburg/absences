@@ -25,6 +25,7 @@ return [
         'revokeMissing' => 'Withdraw report',
         'reportLate' => 'Report as late',
         'reportLeave' => 'Report as leaving',
+        'deleteAbsence' => 'Delete absence',
         'deviationNotice' => 'Please note that absences are usually not fully processed by the office until 8:30 a.m. Therefore, changes may still occur!',
         'officeHoursNotice' => 'Please note that the office will be closed from 1:30 p.m. onwards. Reports of unexcused absences will not be processed by the office until the following day. Please contact the parents yourself!'
     ],

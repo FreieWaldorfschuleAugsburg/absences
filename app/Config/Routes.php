@@ -19,5 +19,6 @@ $routes->get('/api/report_missing/(:any)', 'MissingController::apiReportMissing/
 $routes->get('/api/revoke_missing/(:any)', 'MissingController::apiRevokeMissing/$1', ['filter' => ['staff', 'components']]);
 $routes->get('/api/report_late/(:any)', 'AbsenceController::apiReportLate/$1', ['filter' => ['staff', 'components']]);
 $routes->get('/api/report_leave/(:any)', 'AbsenceController::apiReportLeave/$1', ['filter' => ['staff', 'components']]);
+$routes->get('/api/delete_absence/(:any)', 'AbsenceController::apiDeleteAbsence/$1', ['filter' => ['staff', 'components']]);
 
 $routes->cli('/cron_reminder', 'MissingController::cronFollowUpReminder');

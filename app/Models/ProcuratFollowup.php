@@ -82,4 +82,12 @@ class ProcuratFollowup
     {
         return $this->completed;
     }
+
+    /**
+     * @param bool $completed
+     */
+    public function setCompleted(bool $completed): void
+    {
+        $this->completed = $completed;
+    }
 }

@@ -186,4 +186,32 @@ class AbsenceController extends BaseController
         return "";
     }
 
+    /**
+     * @param string $id
+     * @return string
+     * @throws OAuthException
+     */
+    public function apiDeleteAbsence(string $id): string
+    {
+        $person = getProcuratPerson(intval($id));
+        if (!$person) {
+            $this->response->setStatusCode(404);
+            return "";
+        }
+
+        $absence = getAbsenceToday($person->getId());
+        if (!$absence) {
+            $this->response->setStatusCode(404);
+            return "";
+        }
+
+        if (isHalfDayAbsence($absence)) {
+            $this->response->setStatusCode(400);
+            return "";
+        }
+
+        deleteProcuratAbsence($absence->getId());
+        return "";
+    }
+
 }

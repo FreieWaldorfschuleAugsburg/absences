@@ -96,6 +96,12 @@
                             '</button>';
                     }
 
+                    if (entry.status.name === 'Absent') {
+                        innerHTML += '<button class="btn btn-danger mr-3 btn-sm" onclick="deleteAbsence(this, \'' + entry.person.id + '\')">' +
+                            '<i class="fas fa-trash-can"></i> <?= lang('absences.group.deleteAbsence') ?>' +
+                            '</button>';
+                    }
+
                     innerHTML += '</div></div></div></div>';
                 }
 
@@ -118,6 +124,10 @@
 
     function reportLeave(object, personId) {
         handleRequest(object, '<?= base_url('api/report_leave') ?>/' + personId);
+    }
+
+    function deleteAbsence(object, personId) {
+        handleRequest(object, '<?= base_url('api/delete_absence') ?>/' + personId);
     }
 
     function handleRequest(object, url) {

@@ -290,6 +290,24 @@ function getProcuratFollowUps(): array
     return $followUps;
 }
 
+
+/**
+ * @param int $id
+ * @return ProcuratFollowup|null
+ */
+function getProcuratFollowUp(int $id): ?ProcuratFollowup
+{
+    $client = createAPIClient();
+
+    try {
+        $rawFollowUp = decodeResponse($client->get('followups/' . $id));
+        return constructProcuratFollowUp($rawFollowUp);
+    } catch (GuzzleException $e) {
+        log_message('error', "Error getting follow-ups {exception}", ['exception' => $e]);
+        return null;
+    }
+}
+
 /**
  * @param int $assignedGroupId
  * @param int $referencedPersonId
@@ -316,26 +334,6 @@ function createProcuratFollowUp(int $assignedGroupId, int $referencedPersonId, s
             $assignedGroupId, $referencedPersonId, $dueDate, $subject, $message));
     } catch (GuzzleException $e) {
         log_message('error', "Error creating follow-up {exception}", ['exception' => $e]);
-    }
-}
-
-/**
- * @param int $followUpId
- * @return void
- */
-function completeProcuratFollowUp(int $followUpId): void
-{
-    $client = createAPIClient();
-    try {
-        $client->put('followups/' . $followUpId, [
-            'json' => [
-                'completed' => true
-            ]
-        ]);
-
-        log_message('info', sprintf('Completed follow-up (id=%s)', $followUpId));
-    } catch (GuzzleException $e) {
-        log_message('error', "Error completing follow-up {exception}", ['exception' => $e]);
     }
 }
 
