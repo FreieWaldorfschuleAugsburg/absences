@@ -115,13 +115,13 @@ function findReportablePersons(int $personId): array
             continue;
         }
 
-        // Skip persons who we have no custody for
-        if (!$relationship->isCustody()) {
+        // Skip persons who aren't children
+        if ($relationship->getRelationshipType() != 'son' && $relationship->getRelationshipType() != 'daughter') {
             continue;
         }
 
-        // Skip persons who aren't children
-        if ($relationship->getRelationshipType() != 'son' && $relationship->getRelationshipType() != 'daughter') {
+        // Skip persons who we have no custody for
+        if (!$relationship->isCustody()) {
             continue;
         }
 
