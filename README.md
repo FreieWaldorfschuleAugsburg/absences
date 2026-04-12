@@ -1,3 +1,5 @@
+> Active development was moved: https://codeberg.org/WaldorfAugsburg/absences
+
 # Absences
 
 User-friendly & mobile compatible absence management for Procurat!5
